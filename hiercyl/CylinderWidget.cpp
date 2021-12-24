@@ -126,6 +126,8 @@ void CylinderWidget::normalize(GLfloat* vector)
   vector[2] /= norm; 
 }
 
+
+
 void CylinderWidget::rotateAround(int i){
     slider_1_angle = i;
     this->repaint();
@@ -148,6 +150,49 @@ void CylinderWidget::flatplane(const materialStruct* p_front){
 
     glEnd();
 
+}
+
+
+void CylinderWidget::tree(){ // so the idea is to scale the stuff here and move in paintGL. I think xd.
+
+    glPushMatrix();
+    glScalef(4,4,10); // deform cylinder
+    this->cylinder(&greenRubber);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(0,0,15); // first moves forwards back, middle moves sideway, last up n down
+    glScalef(4.5,4.5,4.5); // deform cylinder
+    glRotatef(90,1,0,0);
+    this->pyramid(&greenRubber);
+    glPopMatrix();
+
+}
+
+void CylinderWidget::pyramid(const materialStruct* p_front){
+
+glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+glBegin(GL_TRIANGLES);
+  //Triangle 1
+    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glColor3f(0.0f,1.0f,0.0f); glVertex3f(-1.0f,-1.0f, 1.0f);   //V1(green)
+    glColor3f(0.0f,0.0f,1.0f); glVertex3f( 1.0f,-1.0f, 1.0f);   //V2(blue)
+  //Triangle 2
+    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glColor3f(0.0f,0.0f,1.0f); glVertex3f( 1.0f,-1.0f, 1.0f);   //V2(blue)
+    glColor3f(0.0f,1.0f,0.0f); glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
+  //Triangle 3
+    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glColor3f(0.0f,1.0f,0.0f); glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
+    glColor3f(0.0f,0.0f,1.0f); glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
+  //Triangle 4
+    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glColor3f(0.0f,0.0f,1.0f); glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
+    glColor3f(0.0f,1.0f,0.0f); glVertex3f(-1.0f,-1.0f, 1.0f);   //V1(green)
+glEnd();
 }
 
 void CylinderWidget::sphere(const materialStruct* p_front ){
@@ -358,7 +403,20 @@ void CylinderWidget::paintGL()
 
         body(_time);
         glPopMatrix(); // pop
+
+        glPushMatrix();
+        glScalef(0.3,0.3,0.3);
+        glTranslatef(2,25.,5); // x is forward and back,y is side ways, z is up or down.
+        tree(); //tree 1
         glPopMatrix(); // pop
+
+
+
+
+        glPopMatrix(); // KEEP THIS AT THE END
+
+
+
 
 
 

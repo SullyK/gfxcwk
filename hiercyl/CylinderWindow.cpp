@@ -31,12 +31,10 @@ CylinderWindow::CylinderWindow(QWidget *parent)
     this->nSlider->setMinimum(0);
     this->nSlider->setMaximum(360);
 
-
-
     pTimer = new QTimer;
-        pTimer->start(10);
+    pTimer->start(10);
 
-        connect(pTimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateAngle()));
+    connect(pTimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateAngle()));
 
     //connect the first slider to slot.
     connect(nSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(rotateAround(int)));
