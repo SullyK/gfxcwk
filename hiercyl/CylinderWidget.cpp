@@ -114,7 +114,7 @@ void CylinderWidget::resizeGL(int w, int h)
         
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-    glOrtho(-20.0, 20.0, -20.0, 20.0, -30.0, 30.0);
+    glOrtho(-20.0, 20.0, -20.0, 20.0, -30.0, 40.0); // quick fix is to increase far.
 
 	} // resizeGL()
 
@@ -133,6 +133,21 @@ void CylinderWidget::rotateAround(int i){
     this->repaint();
 }
 
+void CylinderWidget::moveUpDown(int i){
+    slider_2 = i;
+    this->repaint();
+}
+
+void CylinderWidget::zoomIn(int i){
+    slider_3 = i;
+    this->repaint();
+}
+
+void CylinderWidget::panLeftRight(int i){
+    slider_4 = i;
+    this->repaint();
+}
+
 void CylinderWidget::flatplane(const materialStruct* p_front){
     glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
@@ -147,7 +162,6 @@ void CylinderWidget::flatplane(const materialStruct* p_front){
     glVertex3f(1.0, -1.0, 0.0);
     glVertex3f(1.0, 1.0, 0.0);
     glVertex3f(-1.0, 1.0, 0.0);
-
     glEnd();
 
 }
@@ -209,8 +223,8 @@ void CylinderWidget::sphere(const materialStruct* p_front ){
   float theta_min = -pi;
   float theta_max = pi;
 
-  int n_theta = 200;
-  int n_phi   = 200;
+  int n_theta = 50;
+  int n_phi   = 50;
 
   float delta_phi   = (phi_max - phi_min)/n_phi;
   float delta_theta = (theta_max - theta_min)/n_theta;
@@ -374,8 +388,18 @@ void CylinderWidget::paintGL()
 
     gluLookAt(2.,1.,1., 0.0,0.0,0.0, 0.0,0.0,1.0);
 
+    if(slider_3 == 0){
+        slider_3 = 1;
+    }
+
+    glScalef(slider_3,slider_3,slider_3);
+    std::cout << slider_4 << std::endl;
+
+
     glPushMatrix();
     glRotatef(slider_1_angle,0.,0.,1.);
+    glTranslatef(0.,0.,slider_2);
+    glTranslatef(0,(slider_4 * -1),0);
 
 
 //        glRotatef(180, 0, 1, 0);

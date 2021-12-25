@@ -32,6 +32,9 @@ class CylinderWindow: public QWidget
 	CylinderWidget *cubeWidget;
 	// and a slider for the number of vertices
 	QSlider *nSlider;
+    QSlider *nSlider_2;
+    QSlider *nSlider_3;
+    QSlider *nSlider_4;
 
 	QTimer   *pTimer;
 	  

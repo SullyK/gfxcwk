@@ -18,6 +18,11 @@ class CylinderWidget: public QGLWidget
 	void updateAngle(int);
 	void updateAngle();
     void rotateAround(int);
+    void moveUpDown(int);
+    void zoomIn(int);
+    void panLeftRight(int);
+
+
 	  
 	protected:
 	// called when OpenGL context is set up
@@ -41,7 +46,9 @@ class CylinderWidget: public QGLWidget
 	double _angle;
 	double _time;
     double slider_1_angle;
-
+    double slider_2;
+    double slider_3;
+    double slider_4;
 	  
 	}; // class CylinderWidget
 	
