@@ -35,20 +35,20 @@ CylinderWindow::CylinderWindow(QWidget *parent)
     nSlider_2 = new QSlider(Qt::Horizontal);
     this->nSlider_2->setMinimum(-5);
     this->nSlider_2->setMaximum(5);
-    this->nSlider_2->setValue(0);
+//    this->nSlider_2->setValue(0);
 
     //create slider 3
     nSlider_3 = new QSlider(Qt::Horizontal);
-    this->nSlider_3->setMinimum(1);
-    this->nSlider_3->setMaximum(2);
-    this->nSlider_3->setValue(1);
+    this->nSlider_3->setMinimum(2);
+    this->nSlider_3->setMaximum(4); //get this to down to 2.5 with -0.5 in the function that uses it.
+    this->nSlider_3->setValue(2);
 
 
     //pan left and right.
     nSlider_4 = new QSlider(Qt::Horizontal);
     this->nSlider_4->setMinimum(-20);
     this->nSlider_4->setMaximum(20);
-    this->nSlider_4->setValue(0); // Qt doesn't like me doing * -1 here. I will do it in the function using slider_4
+//    this->nSlider_4->setValue(0); // Qt doesn't like me doing * -1 here. I will do it in the function using slider_4
 
 
 
