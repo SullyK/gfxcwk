@@ -7,6 +7,7 @@ OpenGLStuff/.vs
 /OpenGLStuff/OpenGLStuff/Debug/
 /OpenGLStuff/OpenGLStuff/x64
 OpenGLStuff/OpenGLStuff/src/Application.cpp
+/OpenGLStuff/OpenGLStuff/src/Application.cpp
 cube_with_light/SolidCubeWidget.cpp
 build-Cylinder-Desktop_Qt_5_15_0_MinGW_64_bit-Debug/
 build-SolidCube-Desktop_Qt_5_15_0_MinGW_64_bit-Debug/
@@ -14,3 +15,4 @@ hiercyl(1).tar
 hiercyl.7z
 hiercyl.zip
 tutorial4.tar
+OpenGLStuff/OpenGLStuff/src/Application.cpp

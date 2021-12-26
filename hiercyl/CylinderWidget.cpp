@@ -71,7 +71,11 @@ static const float PI = 3.1415926535;
 CylinderWidget::CylinderWidget(QWidget *parent)
   : QGLWidget(parent),
     _angle(0),
-    _time(0)
+    _time(0),
+  slider_1_angle(0),
+  slider_2(0),
+  slider_3(1),
+  slider_4(0)
 	{ // constructor       
 
 	} // constructor
@@ -114,7 +118,7 @@ void CylinderWidget::resizeGL(int w, int h)
         
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-    glOrtho(-20.0, 20.0, -20.0, 20.0, -30.0, 40.0); // quick fix is to increase far.
+    glOrtho(-20.0, 20.0, -20.0, 20.0, -450.0, 450.0); // quick fix is to increase far.
 
 	} // resizeGL()
 
@@ -386,13 +390,13 @@ void CylinderWidget::paintGL()
 	
     glLoadIdentity();
 
-    gluLookAt(2.,1.,1., 0.0,0.0,0.0, 0.0,0.0,1.0);
+    gluLookAt(2.3,1.,1., 0.0,0.0,0.0, 0.0,0.0,1.0);
 
     if(slider_3 == 0){
         slider_3 = 1;
     }
 
-    glScalef(slider_3,slider_3,slider_3);
+    glScalef(static_cast<float>(slider_3),static_cast<float>(slider_3),static_cast<float>(slider_3));
     std::cout << slider_4 << std::endl;
 
 
