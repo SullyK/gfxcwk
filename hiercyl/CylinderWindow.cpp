@@ -50,8 +50,6 @@ CylinderWindow::CylinderWindow(QWidget *parent)
     this->nSlider_4->setMaximum(20);
 //    this->nSlider_4->setValue(0); // Qt doesn't like me doing * -1 here. I will do it in the function using slider_4
 
-
-
     pTimer = new QTimer;
     pTimer->start(10);
 

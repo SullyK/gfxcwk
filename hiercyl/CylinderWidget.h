@@ -39,7 +39,8 @@ class CylinderWidget: public QGLWidget
 	  void body(double);
 	  void arm(double, double, double);
       void flatplane(const materialStruct*);
-      void tree();
+      void treeBasic();
+      void treeBranches();
       void pyramid(const materialStruct*);
 	  void normalize(GLfloat*);  
 	  

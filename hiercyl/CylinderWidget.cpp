@@ -33,12 +33,13 @@ static materialStruct whiteShinyMaterials = {
   100.0 
 };
 
-static materialStruct uglyMaterials = {
-  { 1.0 , 0.0, 0.0, 1.0},
-  { 0. ,  0.0,  0.0, 1.0},
-  { 0.0, 0.0,  1.0, 1.0},
-  100.0 
+static materialStruct brownBark = {
+  {0.2125f, 0.1275f, 0.054f, 1.0f},
+  { 0.714f, 0.4284f, 0.18144f, 1.0f},
+  { 0.393548f, 0.271906f, 0.166721f, 1.0f},
+  20.6f
 };
+
 
 static materialStruct greenRubber = {
 				     { 0.0f,0.05f,0.0f,1.0f },
@@ -171,21 +172,66 @@ void CylinderWidget::flatplane(const materialStruct* p_front){
 }
 
 
-void CylinderWidget::tree(){ // so the idea is to scale the stuff here and move in paintGL. I think xd.
+void CylinderWidget::treeBasic(){ // so the idea is to scale the stuff here and move in paintGL. I think xd.
 
     glPushMatrix();
-    glScalef(4,4,10); // deform cylinder
-    this->cylinder(&greenRubber);
+    glScalef(2,2,7); // The tree trunk
+    this->cylinder(&brownBark);
     glPopMatrix();
     glPushMatrix();
-    glTranslatef(0,0,15); // first moves forwards back, middle moves sideway, last up n down
-    glScalef(4.5,4.5,4.5); // deform cylinder
-    glRotatef(90,1,0,0);
-    this->pyramid(&greenRubber);
+    glTranslatef(0,0,10); // first moves forwards back, middle moves sideway, last up n down
+    glScalef(5,5,5); // deform cylinder
+//    glRotatef(90,1,0,0);
+    this->sphere(&greenRubber);
     glPopMatrix();
 
 }
 
+
+void CylinderWidget::treeBranches(){ // so the idea is to scale the stuff here and move in paintGL. I think xd.
+
+    glPushMatrix();
+    glScalef(1.5,1.5,12); // The tree trunk
+    this->cylinder(&brownBark);
+
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(0,0,15); // first moves forwards back, middle moves sideway, last up n down
+    glScalef(5,5,5); // deform cylinder
+//    glRotatef(90,1,0,0);
+    this->sphere(&greenRubber);
+
+    glPopMatrix(); // back to the start.
+    glPushMatrix(); // save the start coordinates
+    glTranslatef(3.9,0,5.5); //around half way up the bark
+    glRotatef(70,0,1,0);
+    glScalef(1,1,4);// rotate sideways.
+    this->cylinder(&brownBark);
+
+    glPopMatrix(); // back to the start.
+    glPushMatrix(); // save the start coordinates
+    glScalef(3,3,3); // deform cylinder
+    glTranslatef(3.,0,2.7);
+    this->sphere(&greenRubber);
+
+    glPopMatrix(); // back to the start.
+    glPushMatrix(); // save the start coordinates
+    glTranslatef(-3.9,0,5.5); //around half way up the bark
+    glRotatef(78,0,1,0);
+    glScalef(1,1,4);// rotate sideways.
+    this->cylinder(&brownBark);
+
+    glPopMatrix(); // back to the start.
+    glPushMatrix(); // save the start coordinates
+    glScalef(2,2,2); // deform cylinder
+    glTranslatef(-3.,0,2.7);
+    this->sphere(&greenRubber);
+    glPopMatrix(); // back to the start.
+
+
+}
+
+// for now I will leave pyramid out.
 void CylinderWidget::pyramid(const materialStruct* p_front){
 
 glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
@@ -433,11 +479,16 @@ void CylinderWidget::paintGL()
         glPopMatrix(); // pop
 
         glPushMatrix();
-        glScalef(0.3,0.3,0.3);
+        glScalef(0.3,0.3,0.3); // medium/bigger tree
         glTranslatef(2,25.,5); // x is forward and back,y is side ways, z is up or down.
-        tree(); //tree 1
+        treeBasic(); //tree 1
         glPopMatrix(); // pop
 
+        glPushMatrix();
+        glScalef(0.3,0.3,0.3); // medium/bigger tree
+        glTranslatef(5.,10.,5.); // x is forward and back,y is side ways, z is up or down.
+        treeBranches(); //tree 2
+        glPopMatrix(); // pop
 
 
 
