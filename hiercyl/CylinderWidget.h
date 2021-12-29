@@ -2,6 +2,10 @@
 #define __GL_POLYGON_WIDGET_H__ 1
 
 #include <QGLWidget>
+#include <QImage>
+#include "Image.h"
+
+
 
 struct materialStruct;
 
@@ -50,6 +54,10 @@ class CylinderWidget: public QGLWidget
     double slider_2;
     double slider_3;
     double slider_4;
+    Image   _image;
+    QImage* p_qimage;
+
+
 	  
 	}; // class CylinderWidget
 	

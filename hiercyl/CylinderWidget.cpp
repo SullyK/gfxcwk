@@ -37,7 +37,7 @@ static materialStruct brownBark = {
   {0.2125f, 0.1275f, 0.054f, 1.0f},
   { 0.714f, 0.4284f, 0.18144f, 1.0f},
   { 0.393548f, 0.271906f, 0.166721f, 1.0f},
-  20.6f
+  1.6f
 };
 
 
@@ -76,7 +76,8 @@ CylinderWidget::CylinderWidget(QWidget *parent)
   slider_1_angle(0),
   slider_2(0),
   slider_3(1),
-  slider_4(0)
+  slider_4(0),
+  _image("road.ppm")
 	{ // constructor       
 
 	} // constructor
@@ -114,7 +115,12 @@ void CylinderWidget::resizeGL(int w, int h)
         glEnable(GL_LIGHT0);   // each light source must also be enabled
 
 
-	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image.Width(), _image.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _image.imageField());
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         
 	glMatrixMode(GL_PROJECTION);
@@ -154,19 +160,41 @@ void CylinderWidget::panLeftRight(int i){
 }
 
 void CylinderWidget::flatplane(const materialStruct* p_front){
-    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
-    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
-//    glRotatef(180, 0, 1, 0);
+    GLfloat normals[][3] = { {1., 0. ,0.}, {-1., 0., 0.}, {0., 0., 1.}, {0., 0., -1.}, {0, 1, 0}, {0, -1, 0} };
+
+
+
+
+//    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+//    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+//    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+//    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+////    glRotatef(180, 0, 1, 0);
 //        glTranslatef(90, 0, 0); //Moves it down,
 
 
-    glBegin(GL_POLYGON);
-    glVertex3f(-1.0, -1.0, 0.0);
-    glVertex3f(1.0, -1.0, 0.0);
-    glVertex3f(1.0, 1.0, 0.0);
+        glBegin(GL_POLYGON);
+
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-1.0, -1.0, 0.0); //1 point
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(1.0, -1.0, 0.0); //2 point
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(1.0, 1.0, 0.0); //3 point
+    glTexCoord2f(0.0, 1.0);
     glVertex3f(-1.0, 1.0, 0.0);
+
+//    glNormal3fv(normals[2]);
+//    glBegin(GL_POLYGON);
+//    glTexCoord2f(0.0, 0.0);
+//       glVertex3f(-1.0, -1.0, 1.0);
+//       glTexCoord2f(1.0, 0.0);
+//       glVertex3f( 1.0, -1.0, 1.0);
+//       glTexCoord2f(1.0, 1.0);
+//       glVertex3f( 1.0,  1.0, 1.0);
+//       glTexCoord2f(0.0, 1.0);
+//       glVertex3f(-1.0,  1.0, 1.0);
+
     glEnd();
 
 }
@@ -432,11 +460,15 @@ void CylinderWidget::paintGL()
 	// You must set the matrix mode to model view directly before enabling the depth test
       	glMatrixMode(GL_MODELVIEW);
        	glEnable(GL_DEPTH_TEST); //
+        glEnable(GL_TEXTURE_2D);
+
 
 	
     glLoadIdentity();
 
     gluLookAt(2.3,1.,1., 0.0,0.0,0.0, 0.0,0.0,1.0);
+
+    glRasterPos2i(-1.,-1.);
 
     if(slider_3 == 0){
         slider_3 = 1;
@@ -499,6 +531,8 @@ void CylinderWidget::paintGL()
 
 
 
+        glDrawPixels(_image.Width(),_image.Height(),GL_RGB, GL_UNSIGNED_BYTE,_image.imageField());
+// this above works, not the top one tho...
 
 	// flush to screen
 	glFlush();	

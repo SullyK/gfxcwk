@@ -16,4 +16,5 @@ windows: { LIBS += -lOpenGL32 -lGLU32 }
 HEADERS += CylinderWidget.h CylinderWindow.h 
 SOURCES += CylinderMain.cpp \
            CylinderWidget.cpp \
-           CylinderWindow.cpp
+           CylinderWindow.cpp \
+           Image.cpp
