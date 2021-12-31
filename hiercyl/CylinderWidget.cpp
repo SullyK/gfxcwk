@@ -88,6 +88,7 @@ void CylinderWidget::initializeGL()
 	// set the widget background colour
 	glClearColor(0.3, 0.3, 0.3, 0.0);
 	glOrtho(-4.,4.,-4.,4.,-4.,4);
+
  
 	} // initializeGL()
 
@@ -109,13 +110,17 @@ void CylinderWidget::resizeGL(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	GLfloat light_pos[] = {2., -2.,-2., 1.};
-
-	glEnable(GL_LIGHTING); // enable lighting in general
-        glEnable(GL_LIGHT0);   // each light source must also be enabled
+//    GLfloat light_pos[] = {0., 10., 10., 0.};
 
 
-    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+//	glEnable(GL_LIGHTING); // enable lighting in general
+//        glEnable(GL_LIGHT0);   // each light source must also be enabled
+
+
+//        glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+//        glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0);
+
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image.Width(), _image.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _image.imageField());
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -174,17 +179,17 @@ void CylinderWidget::flatplane(const materialStruct* p_front){
 
 
         glBegin(GL_POLYGON);
+        //    glNormal3fv(normals[2]);
 
     glTexCoord2f(0.0, 0.0);
-    glVertex3f(-1.0, -1.0, 0.0); //1 point
+    glVertex3f(-1.0, 0.0, -1.0); //1 point
     glTexCoord2f(1.0, 0.0);
-    glVertex3f(1.0, -1.0, 0.0); //2 point
+    glVertex3f(1.0,  0.0 , -1.0); //2 point
     glTexCoord2f(1.0, 1.0);
-    glVertex3f(1.0, 1.0, 0.0); //3 point
+    glVertex3f(1.0, 0.0, 1.0); //3 point
     glTexCoord2f(0.0, 1.0);
-    glVertex3f(-1.0, 1.0, 0.0);
+    glVertex3f(-1.0, 0.0, 1.0);
 
-//    glNormal3fv(normals[2]);
 //    glBegin(GL_POLYGON);
 //    glTexCoord2f(0.0, 0.0);
 //       glVertex3f(-1.0, -1.0, 1.0);
@@ -203,11 +208,11 @@ void CylinderWidget::flatplane(const materialStruct* p_front){
 void CylinderWidget::treeBasic(){ // so the idea is to scale the stuff here and move in paintGL. I think xd.
 
     glPushMatrix();
-    glScalef(2,2,7); // The tree trunk
+    glScalef(2,7,2); // The tree trunk
     this->cylinder(&brownBark);
     glPopMatrix();
     glPushMatrix();
-    glTranslatef(0,0,10); // first moves forwards back, middle moves sideway, last up n down
+    glTranslatef(0,10,0); // first moves forwards back, middle moves sideway, last up n down
     glScalef(5,5,5); // deform cylinder
 //    glRotatef(90,1,0,0);
     this->sphere(&greenRubber);
@@ -219,40 +224,40 @@ void CylinderWidget::treeBasic(){ // so the idea is to scale the stuff here and 
 void CylinderWidget::treeBranches(){ // so the idea is to scale the stuff here and move in paintGL. I think xd.
 
     glPushMatrix();
-    glScalef(1.5,1.5,12); // The tree trunk
+    glScalef(1.5,12,1.5); // The tree trunk
     this->cylinder(&brownBark);
 
     glPopMatrix();
     glPushMatrix();
-    glTranslatef(0,0,15); // first moves forwards back, middle moves sideway, last up n down
+    glTranslatef(0,15,0); // first moves forwards back, middle moves sideway, last up n down
     glScalef(5,5,5); // deform cylinder
 //    glRotatef(90,1,0,0);
     this->sphere(&greenRubber);
 
     glPopMatrix(); // back to the start.
     glPushMatrix(); // save the start coordinates
-    glTranslatef(3.9,0,5.5); //around half way up the bark
-    glRotatef(70,0,1,0);
-    glScalef(1,1,4);// rotate sideways.
+    glTranslatef(3.9,5.5,0); //around half way up the bark
+    glRotatef(70,0,0,1);
+    glScalef(1,4,1);// rotate sideways.
     this->cylinder(&brownBark);
 
     glPopMatrix(); // back to the start.
     glPushMatrix(); // save the start coordinates
     glScalef(3,3,3); // deform cylinder
-    glTranslatef(3.,0,2.7);
+    glTranslatef(3.,2.7,0);
     this->sphere(&greenRubber);
 
     glPopMatrix(); // back to the start.
     glPushMatrix(); // save the start coordinates
-    glTranslatef(-3.9,0,5.5); //around half way up the bark
-    glRotatef(78,0,1,0);
-    glScalef(1,1,4);// rotate sideways.
+    glTranslatef(-3.9,5.5,0); //around half way up the bark
+    glRotatef(78,0,0,1);
+    glScalef(1,4,1);// rotate sideways.
     this->cylinder(&brownBark);
 
     glPopMatrix(); // back to the start.
     glPushMatrix(); // save the start coordinates
     glScalef(2,2,2); // deform cylinder
-    glTranslatef(-3.,0,2.7);
+    glTranslatef(-3.,2.7,0);
     this->sphere(&greenRubber);
     glPopMatrix(); // back to the start.
 
@@ -317,23 +322,23 @@ void CylinderWidget::sphere(const materialStruct* p_front ){
       float x_0 = cos(phi)*sin(theta);
       float y_0 = sin(phi)*sin(theta);
       float z_0 = cos(theta);
-      glNormal3f(x_0,y_0,z_0);
-      glVertex3f(x_0,y_0,z_0);
+      glNormal3f(x_0,z_0,y_0);
+      glVertex3f(x_0,z_0,y_0);
       float x_1 = cos(phi+delta_phi)*sin(theta);
       float y_1 = sin(phi+delta_phi)*sin(theta);
       float z_1 = cos(theta);
-      glNormal3f(x_1,y_1,z_1);
-      glVertex3f(x_1,y_1,z_1);
+      glNormal3f(x_1,z_1,y_1);
+      glVertex3f(x_1,z_1,y_1);
       float x_2 = cos(phi+delta_phi)*sin(theta+delta_theta);
       float y_2 = sin(phi+delta_phi)*sin(theta+delta_phi);
       float z_2 = cos(theta + delta_theta);
-      glNormal3f(x_2,y_2,z_2);
-      glVertex3f(x_2,y_2,z_2);
+      glNormal3f(x_2,z_2,y_2);
+      glVertex3f(x_2,z_2,y_2);
       float x_3 = cos(phi)*sin(theta);
       float y_3 = sin(phi)*sin(theta);
       float z_3 = cos(theta + delta_theta);
-      glNormal3f(x_3,y_3,z_3);
-      glVertex3f(x_3,y_3,z_3);
+      glNormal3f(x_3,z_3,y_3);
+      glVertex3f(x_3,z_3,y_3);
 
       
       glEnd();
@@ -367,14 +372,14 @@ void CylinderWidget::cylinder(const materialStruct* p_front){
 
       float z = z_min + i_z*delta_z;
       glBegin(GL_POLYGON);
-      glVertex3f(x0,y0,z);
-      glNormal3f(x0,y0,0);
-      glVertex3f(x1,y1,z);
+      glVertex3f(x0,z,y0);
+      glNormal3f(x0,0,y0);
+      glVertex3f(x1,z,y1);
       glNormal3f(x1,y1,0);
-      glVertex3f(x1,y1,z+delta_z);
-      glNormal3f(x1,y1,0);
-      glVertex3f(x0,y0,z+delta_z);
-      glNormal3f(x0,y0,0);
+      glVertex3f(x1,z+delta_z,y1);
+      glNormal3f(x1,0,y1);
+      glVertex3f(x0,z+delta_z,y0);
+      glNormal3f(x0,0,y0);
       glEnd();
     }
   }
@@ -457,16 +462,27 @@ void CylinderWidget::paintGL()
         glShadeModel(GL_FLAT);
 //        glDisable(GL_LIGHTING);
 
+
 	// You must set the matrix mode to model view directly before enabling the depth test
       	glMatrixMode(GL_MODELVIEW);
        	glEnable(GL_DEPTH_TEST); //
-        glEnable(GL_TEXTURE_2D);
+//        glEnable(GL_TEXTURE_2D);
 
+
+        GLfloat light_pos[] = {4, 4., 4., 1.};
+
+
+        glEnable(GL_LIGHTING); // enable lighting in general
+        glEnable(GL_LIGHT0);   // each light source must also be enabled
+
+
+            glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+            glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180);
 
 	
     glLoadIdentity();
 
-    gluLookAt(2.3,1.,1., 0.0,0.0,0.0, 0.0,0.0,1.0);
+    gluLookAt(2.3,1.,1., 0.0,0.0,0.0, 0.0,1.0,0.0);
 
     glRasterPos2i(-1.,-1.);
 
@@ -479,9 +495,20 @@ void CylinderWidget::paintGL()
 
 
     glPushMatrix();
-    glRotatef(slider_1_angle,0.,0.,1.);
-    glTranslatef(0.,0.,slider_2);
-    glTranslatef(0,(slider_4 * -1),0);
+    glTranslatef(4., 4., 4);
+
+    sphere(&ruby);
+
+    glPopMatrix(); // pop
+
+    glPushMatrix();
+    glRotatef(slider_1_angle,0.,1.,0.);
+    glTranslatef(0.,slider_2,0.0);
+    glTranslatef(0,0,(slider_4 * -1));
+
+
+
+
 
 
 //        glRotatef(180, 0, 1, 0);
@@ -503,35 +530,41 @@ void CylinderWidget::paintGL()
 //        glTranslatef(0.,-10.,0.);
 
 //        glScalef(5,8,0);
+        glRotatef(-90,1,0,0);
 
-        glTranslatef(0,0,5);
+        glTranslatef(0,5,0);
         glScalef(0.3,0.3,0.3);
 
         body(_time);
         glPopMatrix(); // pop
 
         glPushMatrix();
+//        glRotatef(0)
         glScalef(0.3,0.3,0.3); // medium/bigger tree
-        glTranslatef(2,25.,5); // x is forward and back,y is side ways, z is up or down.
+        glTranslatef(2,5,25.); // x is forward and back,y is side ways, z is up or down.
         treeBasic(); //tree 1
         glPopMatrix(); // pop
 
         glPushMatrix();
         glScalef(0.3,0.3,0.3); // medium/bigger tree
-        glTranslatef(5.,10.,5.); // x is forward and back,y is side ways, z is up or down.
+        glTranslatef(5.,5.,10.); // x is forward and back,y is side ways, z is up or down.
         treeBranches(); //tree 2
         glPopMatrix(); // pop
 
 
 
         glPopMatrix(); // KEEP THIS AT THE END
+        glPushMatrix(); //
 
 
 
 
 
 
-        glDrawPixels(_image.Width(),_image.Height(),GL_RGB, GL_UNSIGNED_BYTE,_image.imageField());
+
+glPopMatrix();
+
+//        glDrawPixels(_image.Width(),_image.Height(),GL_RGB, GL_UNSIGNED_BYTE,_image.imageField());
 // this above works, not the top one tho...
 
 	// flush to screen
