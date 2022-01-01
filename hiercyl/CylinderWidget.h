@@ -47,7 +47,11 @@ class CylinderWidget: public QGLWidget
       void treeBranches();
       void pyramid(const materialStruct*);
 	  void normalize(GLfloat*);  
-	  
+      void windTrunk(const materialStruct*);
+      void windBlade(const materialStruct*);
+      void windHead(const materialStruct*);
+      void windMill(double);
+
 	double _angle;
 	double _time;
     double slider_1_angle;

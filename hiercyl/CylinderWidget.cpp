@@ -19,6 +19,31 @@ typedef struct materialStruct {
 } materialStruct;
 
 
+static materialStruct blackPlastic = {
+  { 0.0f, 0.0f, 0.0f, 1.0f},
+  {0.01f, 0.01f, 0.01f, 1.0f},
+  {0.50f, 0.50f, 0.50f, 1.0f},
+   32.0f
+};
+
+
+
+static materialStruct whitePlastic = {
+  {  0.05f,0.05f,0.05f,1.0f},
+  {0.5f,0.5f,0.5f,1.0f},
+  { 0.7f,0.7f,0.7f,1.0f},
+   10.0f
+};
+
+
+static materialStruct silver = {
+  { 0.19225f, 0.19225f, 0.19225f, 1.0f},
+  { 0.50754f, 0.50754f, 0.50754f, 1.0f},
+  { 0.508273f, 0.508273f, 0.508273f, 1.0f},
+   51.2f
+};
+
+
 static materialStruct brassMaterials = {
   { 0.33, 0.22, 0.03, 1.0},
   { 0.78, 0.57, 0.11, 1.0},
@@ -452,6 +477,161 @@ void CylinderWidget::body(double time){
   glPopMatrix();
 }
 
+
+
+void CylinderWidget::windHead(const materialStruct* p_front){
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+   constexpr double pi = 3.14159265358979323846;
+   float phi_min = 0;
+   float phi_max = 2*pi;
+
+   float theta_min = -pi;
+   float theta_max = pi;
+
+   int n_theta = 50;
+   int n_phi   = 50;
+
+   float delta_phi   = (phi_max - phi_min)/n_phi;
+   float delta_theta = (theta_max - theta_min)/n_theta;
+
+   for (int i_phi = 0; i_phi < n_phi; i_phi++)
+     for (int i_theta = 0; i_theta < n_theta; i_theta++){
+
+       glBegin(GL_POLYGON);
+       float phi   = phi_min + i_phi*delta_phi;
+       float theta = theta_min + i_theta*delta_theta;
+
+       float x_0 = cos(phi)*sin(theta);
+       float y_0 = sin(phi)*sin(theta);
+       float z_0 = cos(theta);
+       glNormal3f(x_0,z_0,y_0);
+       glVertex3f(x_0,z_0,y_0);
+       float x_1 = cos(phi+delta_phi)*sin(theta);
+       float y_1 = sin(phi+delta_phi)*sin(theta);
+       float z_1 = cos(theta);
+       glNormal3f(x_1,z_1,y_1);
+       glVertex3f(x_1,z_1,y_1);
+       float x_2 = cos(phi+delta_phi)*sin(theta+delta_theta);
+       float y_2 = sin(phi+delta_phi)*sin(theta+delta_phi);
+       float z_2 = cos(theta + delta_theta);
+       glNormal3f(x_2,z_2,y_2);
+       glVertex3f(x_2,z_2,y_2);
+       float x_3 = cos(phi)*sin(theta);
+       float y_3 = sin(phi)*sin(theta);
+       float z_3 = cos(theta + delta_theta);
+       glNormal3f(x_3,z_3,y_3);
+       glVertex3f(x_3,z_3,y_3);
+
+
+       glEnd();
+
+     }
+}
+
+
+
+void CylinderWidget::windBlade(const materialStruct* p_front){
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+    glBegin(GL_POLYGON);
+    GLUquadricObj *quadObj = gluNewQuadric();
+    gluCylinder(quadObj, 1.5, 0., 18., 1000, 100);
+    glEnd();
+
+
+
+
+
+}
+
+
+
+void CylinderWidget::windTrunk(const materialStruct* p_front){
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+    float x0, x1, y0, y1;
+
+    float z_min = -1;
+    float z_max =  1;
+
+    float delta_z = (z_max - z_min)/n_div;
+
+    for (int i = 0; i < N; i++){
+      for(int i_z = 0; i_z < n_div; i_z++){
+        x0 = cos(2*i*PI/N);
+        x1 = cos(2*(i+1)*PI/N);
+        y0 = sin(2*i*PI/N);
+        y1 = sin(2*(i+1)*PI/N);
+
+        float z = z_min + i_z*delta_z;
+        glBegin(GL_POLYGON);
+        glVertex3f(x0,z,y0);
+        glNormal3f(x0,0,y0);
+        glVertex3f(x1,z,y1);
+        glNormal3f(x1,y1,0);
+        glVertex3f(x1,z+delta_z,y1);
+        glNormal3f(x1,0,y1);
+        glVertex3f(x0,z+delta_z,y0);
+        glNormal3f(x0,0,y0);
+        glEnd();
+      }
+    }
+}
+
+void CylinderWidget::windMill(double time){
+
+    glPushMatrix();
+    glScalef(0.5,6,0.5); // The tree trunk
+    this->windTrunk(&whitePlastic);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(0,6.8,0); // TODO: FIX THESE HEIGHT/SCALING TO A SUITABLE SIZE LATER.
+    //    glScalef(1,1,1); // deform cylinder
+//    glRotatef(90,1,0,0);
+    this->windHead(&whitePlastic);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(0,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glScalef(0.4,0.4,0.4);
+    this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glScalef(0.4,0.4,0.4);
+    glRotatef(-120,1,0,0);
+    this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glScalef(0.4,0.4,0.4);
+    glRotatef(-240,1,0,0);
+    this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
+
+
+
+
+    glPopMatrix(); // KEEP this one at the end
+
+
+
+
+
+}
 // called every time the widget needs painting
 void CylinderWidget::paintGL()
     { // paintGL()
@@ -469,7 +649,7 @@ void CylinderWidget::paintGL()
 //        glEnable(GL_TEXTURE_2D);
 
 
-        GLfloat light_pos[] = {4, 4., 4., 1.};
+        GLfloat light_pos[] = {8,8., 8., 1.}; //TODO: Fix this light source up"
 
 
         glEnable(GL_LIGHTING); // enable lighting in general
@@ -482,7 +662,7 @@ void CylinderWidget::paintGL()
 	
     glLoadIdentity();
 
-    gluLookAt(2.3,1.,1., 0.0,0.0,0.0, 0.0,1.0,0.0);
+    gluLookAt(2.3,0.7,1., 0.0,0.0,0.0, 0.0,1.0,0.0);
 
     glRasterPos2i(-1.,-1.);
 
@@ -495,17 +675,27 @@ void CylinderWidget::paintGL()
 
 
     glPushMatrix();
-    glTranslatef(4., 4., 4);
+    glTranslatef(8,8., 8);
 
     sphere(&ruby);
 
     glPopMatrix(); // pop
 
-    glPushMatrix();
+
     glRotatef(slider_1_angle,0.,1.,0.);
     glTranslatef(0.,slider_2,0.0);
     glTranslatef(0,0,(slider_4 * -1));
 
+
+    glPushMatrix();
+    glTranslatef(0,5,0);
+//    glScalef(5,5,5);
+    windMill(_time);
+//    pyramid(&ruby);
+    glPopMatrix(); // pop
+
+
+    glPushMatrix();
 
 
 
@@ -530,7 +720,7 @@ void CylinderWidget::paintGL()
 //        glTranslatef(0.,-10.,0.);
 
 //        glScalef(5,8,0);
-        glRotatef(-90,1,0,0);
+        glRotatef(-90,1,0,0); //hacky fix for the guy....
 
         glTranslatef(0,5,0);
         glScalef(0.3,0.3,0.3);
