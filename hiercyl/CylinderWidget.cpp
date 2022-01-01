@@ -604,27 +604,25 @@ void CylinderWidget::windMill(double time){
     this->windHead(&whitePlastic);
     glPopMatrix();
     glPushMatrix();
-    glTranslatef(0,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glTranslatef(0.2,7,0); // first moves forwards back, middle moves sideway, last up n down
     glScalef(0.4,0.4,0.4);
+    glRotatef(0 + time,1,0,0);
+
     this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(0,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glTranslatef(0.2,7,0); // first moves forwards back, middle moves sideway, last up n down
     glScalef(0.4,0.4,0.4);
-    glRotatef(-120,1,0,0);
+    glRotatef(-120 + time,1,0,0);
     this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(0,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glTranslatef(0.2,7,0); // first moves forwards back, middle moves sideway, last up n down
     glScalef(0.4,0.4,0.4);
-    glRotatef(-240,1,0,0);
+    glRotatef(-240 + time,1,0,0);
     this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
-
-
-
-
     glPopMatrix(); // KEEP this one at the end
 
 
@@ -688,7 +686,7 @@ void CylinderWidget::paintGL()
 
 
     glPushMatrix();
-    glTranslatef(0,5,0);
+    glTranslatef(-3.,5.,10.); // x is forward and back,y is side ways, z is up or down.
 //    glScalef(5,5,5);
     windMill(_time);
 //    pyramid(&ruby);
@@ -731,13 +729,13 @@ void CylinderWidget::paintGL()
         glPushMatrix();
 //        glRotatef(0)
         glScalef(0.3,0.3,0.3); // medium/bigger tree
-        glTranslatef(2,5,25.); // x is forward and back,y is side ways, z is up or down.
+        glTranslatef(2,5,-15.); // x is forward and back,y is side ways, z is up or down.
         treeBasic(); //tree 1
         glPopMatrix(); // pop
 
         glPushMatrix();
-        glScalef(0.3,0.3,0.3); // medium/bigger tree
-        glTranslatef(5.,5.,10.); // x is forward and back,y is side ways, z is up or down.
+        glScalef(0.3,0.3,0.3); // medium/bigger tree //TODO: FIX TREES
+        glTranslatef(5.,5.,-25.); // x is forward and back,y is side ways, z is up or down.
         treeBranches(); //tree 2
         glPopMatrix(); // pop
 
