@@ -51,6 +51,17 @@ class CylinderWidget: public QGLWidget
       void windBlade(const materialStruct*);
       void windHead(const materialStruct*);
       void windMill(double);
+      void tankCannon(const materialStruct*);
+      void tankHead(const materialStruct*);
+      void tankHeadCover(const materialStruct*);
+      void tankMiddle(const materialStruct*);
+      void tankMiddleSide(const materialStruct*);
+      void tankWheels(const materialStruct*);
+      void turret(double, double);
+      void base(double, double);
+      void tank();
+
+
 
 	double _angle;
 	double _time;

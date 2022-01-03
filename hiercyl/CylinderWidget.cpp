@@ -550,7 +550,6 @@ void CylinderWidget::windBlade(const materialStruct* p_front){
 
 
 
-
 }
 
 
@@ -625,11 +624,150 @@ void CylinderWidget::windMill(double time){
     this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
     glPopMatrix(); // KEEP this one at the end
 
+}
 
 
+void CylinderWidget::tankHead(const materialStruct* p_front){
 
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+    glBegin(GL_POLYGON);
+    GLUquadricObj *quadObj = gluNewQuadric();
+    gluCylinder(quadObj, 10, 10., 10., 100, 100);
+    glEnd();
+
+    //SO this needs to be rotated down -90? dont think it matters. Anyway do this in the actual part where I put it together. Has potential perfomance issues/mem leaks.
 
 }
+
+void CylinderWidget::tankHeadCover(const materialStruct* p_front){
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+    glBegin(GL_POLYGON);
+    GLUquadricObj *quadObj = gluNewQuadric();
+    gluDisk(quadObj,10,10,100,100);
+    glEnd();
+
+}
+
+void CylinderWidget::tankCannon(const materialStruct* p_front){
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+    glBegin(GL_POLYGON);
+    GLUquadricObj *quadObj = gluNewQuadric();
+    gluCylinder(quadObj, 10, 10., 150., 100, 100);
+    glEnd();
+
+}
+
+void CylinderWidget::tankMiddle(const materialStruct* p_front){ //TODO: FIX THE LIGHTING ON THIS CRAP.
+
+
+    GLfloat normals[][3] = { {0., 1. ,0.}, {0., -1., 0.}, {0., 0., 1.}, {0., 0., -1.}, {-1, 0, 0}, {1, 0, 0} };
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+
+    glBegin(GL_POLYGON);
+    glNormal3fv(normals[0]);
+    glVertex3f(1.0f, 1.0f, -1.0f);
+    glVertex3f(-1.0f, 1.0f, -1.0f);
+    glVertex3f(-1.0f, 1.0f, 1.0f);
+    glVertex3f(1.0f, 1.0f, 1.0f);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glNormal3fv(normals[1]);
+    glVertex3f(1.0f, -1.0f, 1.0f);
+    glVertex3f(-1.0f, -1.0f, 1.0f);
+    glVertex3f(-1.0f, -1.0f, -1.0f);
+    glVertex3f(1.0f, -1.0f, -1.0f);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glNormal3fv(normals[2]);
+    glVertex3f(1.0f, 1.0f, 1.0f);
+    glVertex3f(-1.0f, 1.0f, 1.0f);
+    glVertex3f(-1.0f, -1.0f, 1.0f);
+    glVertex3f(1.0f, -1.0f, 1.0f);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glNormal3fv(normals[3]);
+    glVertex3f(1.0f, -1.0f, -1.0f);
+    glVertex3f(-1.0f, -1.0f, -1.0f);
+    glVertex3f(-1.0f, 1.0f, -1.0f);
+    glVertex3f(1.0f, 1.0f, -1.0f);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glNormal3fv(normals[4]);
+    glVertex3f(-1.0f, 1.0f, 1.0f);
+    glVertex3f(-1.0f, 1.0f, -1.0f);
+    glVertex3f(-1.0f, -1.0f, -1.0f);
+    glVertex3f(-1.0f, -1.0f, 1.0f);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glNormal3fv(normals[5]);
+    glVertex3f(1.0f, 1.0f, -1.0f);
+    glVertex3f(1.0f, 1.0f, 1.0f);
+    glVertex3f(1.0f, -1.0f, 1.0f);
+    glVertex3f(1.0f, -1.0f, -1.0f);
+    glEnd();
+
+}
+
+void CylinderWidget::base(double time, double angle){
+
+    glPushMatrix();
+    glScalef(9,3,9);
+    this->tankMiddle(&silver);
+    glPopMatrix();
+
+}
+
+void CylinderWidget::turret(double time, double angle){ // this angle may not be required. Time will tell.
+
+    glPushMatrix(); //start with the head of the tank.
+    glScalef(0.3,0.3,0.3);
+//    glTranslatef(10,10,10);
+    glRotatef(-90,1,0,0);
+    this->tankHead(&ruby);
+    glPopMatrix();
+
+    glPushMatrix();
+    glScalef(0.3,0.3,0.3);
+    glRotatef(270,1,0,0);
+    glTranslatef(0,0,10); //3rd done
+    this->tankHeadCover(&ruby);
+    glPopMatrix();
+
+    glPushMatrix();
+    glScalef(0.065,0.065,0.065);
+    glTranslatef(0,20,0);
+
+
+    this->tankCannon(&silver);
+    glPopMatrix();
+
+//    glPopMatrix();
+
+}
+
 // called every time the widget needs painting
 void CylinderWidget::paintGL()
     { // paintGL()
@@ -657,6 +795,9 @@ void CylinderWidget::paintGL()
             glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
             glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180);
 
+//            GLfloat ambientColour[] = {.5,.5,.5,1.};
+//            glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColour);
+
 	
     glLoadIdentity();
 
@@ -675,7 +816,9 @@ void CylinderWidget::paintGL()
     glPushMatrix();
     glTranslatef(8,8., 8);
 
-    sphere(&ruby);
+//    sphere(&ruby);
+//    tankHeadCover(&ruby);
+//    tankMiddle(&ruby);
 
     glPopMatrix(); // pop
 
@@ -686,11 +829,20 @@ void CylinderWidget::paintGL()
 
 
     glPushMatrix();
+    glTranslatef(3.,5.,-10.); // x is forward and back,y is side ways, z is up or down.
+    tankMiddle(&ruby);
+    glPopMatrix();
+
+    glPushMatrix();
     glTranslatef(-3.,5.,10.); // x is forward and back,y is side ways, z is up or down.
 //    glScalef(5,5,5);
     windMill(_time);
+//    tankMiddle(&ruby);
+
+
 //    pyramid(&ruby);
     glPopMatrix(); // pop
+
 
 
     glPushMatrix();
@@ -739,10 +891,25 @@ void CylinderWidget::paintGL()
         treeBranches(); //tree 2
         glPopMatrix(); // pop
 
+        glPushMatrix();
+        glTranslatef(2,2,10);
+        glScalef(0.34,0.34,0.34);
+        base(0,0);
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(2,3,10);
+        glScalef(0.5,0.5,0.5);
+        turret(0,0);// 0,0 for now. TODO: Sort this out
+        glPopMatrix();
+
+
 
 
         glPopMatrix(); // KEEP THIS AT THE END
         glPushMatrix(); //
+
+
 
 
 
