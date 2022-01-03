@@ -731,16 +731,90 @@ void CylinderWidget::tankMiddle(const materialStruct* p_front){ //TODO: FIX THE 
 
 }
 
-void CylinderWidget::base(double time, double angle){
+void CylinderWidget::tankWheels(const materialStruct* p_front){
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+    glBegin(GL_POLYGON);
+    GLUquadricObj *quadObj = gluNewQuadric();
+    gluCylinder(quadObj, 4, 4., 2., 1000, 100);
+    glEnd();
+}
+
+void CylinderWidget::base(){
 
     glPushMatrix();
     glScalef(9,3,9);
     this->tankMiddle(&silver);
     glPopMatrix();
+    glPushMatrix();
+    glTranslatef(0,0,-11.5);
+    glScalef(9,3.2,3.2);
+    glRotatef(-90,1,0,0);
+    this->pyramid(&silver);  // back side of the tank.
+    //TODO: Fix the lighting on the pyramid
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(0,0,11.5);
+    glScalef(9,3.2,3.2);
+    glRotatef(90,1,0,0);
+    this->pyramid(&silver);  // front side of the tank.
+    //TODO: THIS PYRAMID MIGHT NEED DIFFERENT NORMALS, BUT PROBS NOT IF I WORK THEM OUT.
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(10,-1,7);
+    glScalef(0.7,0.7,0.7);
+    glRotatef(-90,0,1,0);
+    this->tankWheels(&ruby);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(10,-1,0);
+    glScalef(0.7,0.7,0.7);
+    glRotatef(-90,0,1,0);
+    this->tankWheels(&ruby);
+    glPopMatrix();
+
+
+    glPushMatrix();
+    glTranslatef(10,-1,-7);
+    glScalef(0.7,0.7,0.7);
+    glRotatef(-90,0,1,0);
+    this->tankWheels(&ruby);
+    glPopMatrix();
+
+
+    glPushMatrix();
+    glTranslatef(-10,-1,-7);
+    glScalef(0.7,0.7,0.7);
+    glRotatef(90,0,1,0);
+    this->tankWheels(&ruby);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-10,-1,0);
+    glScalef(0.7,0.7,0.7);
+    glRotatef(90,0,1,0);
+    this->tankWheels(&ruby);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-10,-1,7);
+    glScalef(0.7,0.7,0.7);
+    glRotatef(90,0,1,0);
+    this->tankWheels(&ruby);
+    glPopMatrix();
+
+
+
+
 
 }
 
-void CylinderWidget::turret(double time, double angle){ // this angle may not be required. Time will tell.
+void CylinderWidget::turret(){ // this angle may not be required. Time will tell.
 
     glPushMatrix(); //start with the head of the tank.
     glScalef(0.3,0.3,0.3);
@@ -765,6 +839,22 @@ void CylinderWidget::turret(double time, double angle){ // this angle may not be
     glPopMatrix();
 
 //    glPopMatrix();
+
+}
+
+void CylinderWidget::tank(double time, double angle){
+
+    glPushMatrix();
+    glTranslatef(2,2,10);
+    glScalef(0.34,0.34,0.34);
+    base();
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(2,3,10);
+    glScalef(0.5,0.5,0.5);
+    turret();// 0,0 for now. TODO: Sort this out
+    glPopMatrix();
 
 }
 
@@ -798,7 +888,7 @@ void CylinderWidget::paintGL()
 //            GLfloat ambientColour[] = {.5,.5,.5,1.};
 //            glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColour);
 
-	
+
     glLoadIdentity();
 
     gluLookAt(2.3,0.7,1., 0.0,0.0,0.0, 0.0,1.0,0.0);
@@ -892,15 +982,8 @@ void CylinderWidget::paintGL()
         glPopMatrix(); // pop
 
         glPushMatrix();
-        glTranslatef(2,2,10);
-        glScalef(0.34,0.34,0.34);
-        base(0,0);
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(2,3,10);
-        glScalef(0.5,0.5,0.5);
-        turret(0,0);// 0,0 for now. TODO: Sort this out
+//        glScalef(,10,10);
+        tank(_time,0); // TODO: make angle variable
         glPopMatrix();
 
 

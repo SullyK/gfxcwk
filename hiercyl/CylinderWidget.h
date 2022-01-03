@@ -57,9 +57,9 @@ class CylinderWidget: public QGLWidget
       void tankMiddle(const materialStruct*);
       void tankMiddleSide(const materialStruct*);
       void tankWheels(const materialStruct*);
-      void turret(double, double);
-      void base(double, double);
-      void tank();
+      void turret();
+      void base();
+      void tank(double,double);
 
 
 
