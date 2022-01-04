@@ -843,17 +843,29 @@ void CylinderWidget::turret(){ // this angle may not be required. Time will tell
 }
 
 void CylinderWidget::tank(double time, double angle){
+    glPushMatrix();
+//    glTranslatef(2,2,10);
+
+    glRotatef(time * 0.4,0.,-1,0);
+//    glRotatef(time + 0.5,0.,-1,0);
+
+//    glRotatef(time+ 0.5,0,0,1);
 
     glPushMatrix();
     glTranslatef(2,2,10);
+    glRotatef(60,0.,-1,0);
     glScalef(0.34,0.34,0.34);
     base();
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(2,3,10);
+    glRotatef(time * 1.2,0.,1,0);
     glScalef(0.5,0.5,0.5);
+
     turret();// 0,0 for now. TODO: Sort this out
+    glPopMatrix();
+
     glPopMatrix();
 
 }
