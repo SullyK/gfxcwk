@@ -54,11 +54,14 @@ class CylinderWidget: public QGLWidget
       void tankCannon(const materialStruct*);
       void tankHead(const materialStruct*);
       void tankHeadCover(const materialStruct*);
-      void tankMiddle(const materialStruct*);
+//      void tankMiddle(const materialStruct*); // removed as I used the cube
       void tankMiddleSide(const materialStruct*);
       void tankWheels(const materialStruct*);
       void turret();
       void base();
+      void barn();
+      void cube(const materialStruct*);
+
       void tank(double,double);
 
 

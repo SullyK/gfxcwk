@@ -292,29 +292,46 @@ void CylinderWidget::treeBranches(){ // so the idea is to scale the stuff here a
 // for now I will leave pyramid out.
 void CylinderWidget::pyramid(const materialStruct* p_front){
 
+GLfloat normals[][3] = { {0., 0.4472135954999579 ,0.8944271909999159},
+                         {0.4472135954999579, 0.4472135954999579, 0.},
+                         {0., 0.4472135954999579, -0.8944271909999159},
+                         {-0.8944271909999159, 0.4472135954999579, 0}};
+
 glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
 glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
 glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
 glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
 
-glBegin(GL_TRIANGLES);
+    glBegin(GL_POLYGON);
   //Triangle 1
-    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
-    glColor3f(0.0f,1.0f,0.0f); glVertex3f(-1.0f,-1.0f, 1.0f);   //V1(green)
-    glColor3f(0.0f,0.0f,1.0f); glVertex3f( 1.0f,-1.0f, 1.0f);   //V2(blue)
+    glNormal3fv(normals[0]);
+    glVertex3f( 0.0f, 1.0f, 0.0f);
+    glVertex3f(-1.0f,-1.0f, 1.0f);
+    glVertex3f( 1.0f,-1.0f, 1.0f);
+    glEnd();
   //Triangle 2
-    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
-    glColor3f(0.0f,0.0f,1.0f); glVertex3f( 1.0f,-1.0f, 1.0f);   //V2(blue)
-    glColor3f(0.0f,1.0f,0.0f); glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
+    glBegin(GL_POLYGON);
+    glNormal3fv(normals[1]);
+    glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glVertex3f( 1.0f,-1.0f, 1.0f);   //V2(blue)
+    glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
+    glEnd();
   //Triangle 3
-    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
-    glColor3f(0.0f,1.0f,0.0f); glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
-    glColor3f(0.0f,0.0f,1.0f); glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
+    glBegin(GL_POLYGON);
+
+    glNormal3fv(normals[2]);
+    glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
+    glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
+    glEnd();
   //Triangle 4
-    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
-    glColor3f(0.0f,0.0f,1.0f); glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
-    glColor3f(0.0f,1.0f,0.0f); glVertex3f(-1.0f,-1.0f, 1.0f);   //V1(green)
-glEnd();
+    glBegin(GL_POLYGON);
+
+    glNormal3fv(normals[3]);
+    glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
+    glVertex3f(-1.0f,-1.0f, 1.0f);   //V1(green)
+    glEnd();
 }
 
 void CylinderWidget::sphere(const materialStruct* p_front ){
@@ -670,8 +687,7 @@ void CylinderWidget::tankCannon(const materialStruct* p_front){
 
 }
 
-void CylinderWidget::tankMiddle(const materialStruct* p_front){ //TODO: FIX THE LIGHTING ON THIS CRAP.
-
+void CylinderWidget::cube(const materialStruct* p_front){
 
     GLfloat normals[][3] = { {0., 1. ,0.}, {0., -1., 0.}, {0., 0., 1.}, {0., 0., -1.}, {-1, 0, 0}, {1, 0, 0} };
 
@@ -731,6 +747,7 @@ void CylinderWidget::tankMiddle(const materialStruct* p_front){ //TODO: FIX THE 
 
 }
 
+
 void CylinderWidget::tankWheels(const materialStruct* p_front){
     glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
@@ -747,7 +764,7 @@ void CylinderWidget::base(){
 
     glPushMatrix();
     glScalef(9,3,9);
-    this->tankMiddle(&silver);
+    this->cube(&silver); //tank middle
     glPopMatrix();
     glPushMatrix();
     glTranslatef(0,0,-11.5);
@@ -808,10 +825,6 @@ void CylinderWidget::base(){
     this->tankWheels(&ruby);
     glPopMatrix();
 
-
-
-
-
 }
 
 void CylinderWidget::turret(){ // this angle may not be required. Time will tell.
@@ -846,27 +859,38 @@ void CylinderWidget::tank(double time, double angle){
     glPushMatrix();
 //    glTranslatef(2,2,10);
 
-    glRotatef(time * 0.4,0.,-1,0);
+    glRotatef(time * 0.2,0.,-1,0);
 //    glRotatef(time + 0.5,0.,-1,0);
 
 //    glRotatef(time+ 0.5,0,0,1);
 
     glPushMatrix();
-    glTranslatef(2,2,10);
+    glTranslatef(2,2,15);
     glRotatef(60,0.,-1,0);
     glScalef(0.34,0.34,0.34);
     base();
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(2,3,10);
-    glRotatef(time * 1.2,0.,1,0);
+    glTranslatef(2,3,15);
+    glRotatef(time * 0.5,0.,1,0);
     glScalef(0.5,0.5,0.5);
 
     turret();// 0,0 for now. TODO: Sort this out
     glPopMatrix();
 
     glPopMatrix();
+}
+
+void CylinderWidget::barn(){
+    glPushMatrix();
+    this->cube(&brassMaterials);
+    glPopMatrix();
+    glPushMatrix();
+   glTranslatef(0,2,0);
+    this->pyramid(&ruby);
+    glPopMatrix();
+
 
 }
 
@@ -932,7 +956,7 @@ void CylinderWidget::paintGL()
 
     glPushMatrix();
     glTranslatef(3.,5.,-10.); // x is forward and back,y is side ways, z is up or down.
-    tankMiddle(&ruby);
+//    tankMiddle(&ruby);
     glPopMatrix();
 
     glPushMatrix();
@@ -966,19 +990,15 @@ void CylinderWidget::paintGL()
 
         //back to the original matrix.
 
-        glPushMatrix();
+//        glPushMatrix();
 
+//        glRotatef(-90,1,0,0); //hacky fix for the guy....
 
-//        glTranslatef(0.,-10.,0.);
+//        glTranslatef(0,5,0);
+//        glScalef(0.3,0.3,0.3);
 
-//        glScalef(5,8,0);
-        glRotatef(-90,1,0,0); //hacky fix for the guy....
-
-        glTranslatef(0,5,0);
-        glScalef(0.3,0.3,0.3);
-
-        body(_time);
-        glPopMatrix(); // pop
+////        body(_time);
+//        glPopMatrix(); // pop
 
         glPushMatrix();
 //        glRotatef(0)
@@ -997,6 +1017,13 @@ void CylinderWidget::paintGL()
 //        glScalef(,10,10);
         tank(_time,0); // TODO: make angle variable
         glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(3,2,4);
+        glScalef(3,3,3);
+        barn();
+        glPopMatrix();
+
 
 
 
