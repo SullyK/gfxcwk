@@ -5,12 +5,12 @@
 
 #include "CylinderWidget.h"
 
-// Play with these parameters
-static const int N        = 80; // This determines the number of faces of the cylinder
-static const int n_div   =  80;  // This determines the fineness of the cylinder along its length
+//some numbers used in cylinder/sphere calculations(from the tutorials)
+static const int N        = 80;
+static const int n_div   =  80;
 
 
-// Setting up material properties
+//material struct for adding lighting.
 typedef struct materialStruct {
   GLfloat ambient[4];
   GLfloat diffuse[4];
@@ -19,6 +19,8 @@ typedef struct materialStruct {
 } materialStruct;
 
 
+//different colours used in the project.
+
 static materialStruct blackPlastic = {
   { 0.0f, 0.0f, 0.0f, 1.0f},
   {0.01f, 0.01f, 0.01f, 1.0f},
@@ -26,7 +28,12 @@ static materialStruct blackPlastic = {
    32.0f
 };
 
-
+static materialStruct polished_copper = {
+  { 0.2295f, 0.08825f, 0.0275f, 1.0f},
+  {0.5508f, 0.2118f, 0.066f, 1.0f},
+  { 0.580594f, 0.223257f, 0.0695701f, 1.0f },
+   40.0f
+};
 
 static materialStruct whitePlastic = {
   {  0.05f,0.05f,0.05f,1.0f},
@@ -44,19 +51,6 @@ static materialStruct silver = {
 };
 
 
-static materialStruct brassMaterials = {
-  { 0.33, 0.22, 0.03, 1.0},
-  { 0.78, 0.57, 0.11, 1.0},
-  { 0.99, 0.91, 0.81, 1.0},
-  27.8 
-};
-
-static materialStruct whiteShinyMaterials = {
-  { 1.0, 1.0, 1.0, 1.0},
-  { 1.0, 1.0, 1.0, 1.0},
-  { 1.0, 1.0, 1.0, 1.0},
-  100.0 
-};
 
 static materialStruct brownBark = {
   {0.2125f, 0.1275f, 0.054f, 1.0f},
@@ -72,18 +66,6 @@ static materialStruct greenRubber = {
 				     {0.04f,0.7f,0.04f,1.0f },
 				     10.0f };
 
-static materialStruct emeraldMaterial = {
-					 { 0.1f, 0.18725f, 0.1745f, 0.8f },
-					 {0.396f, 0.74151f, 0.69102f, 0.8f },
-					 {0.297254f, 0.30829f, 0.306678f, 0.8f },
-					 12.8f };
-
-
-static materialStruct yellowPlastic = {
-				       {0.0f,0.0f,0.0f,1.0f },
-				       {0.5f,0.5f,0.0f,1.0f },
-				       {0.60f,0.60f,0.50f,1.0f },
-				       32.0f};
 
 static materialStruct ruby = {
 			      { 0.1745f, 0.01175f, 0.01175f, 0.55f },
@@ -91,10 +73,9 @@ static materialStruct ruby = {
 			      {0.727811f, 0.626959f, 0.626959f, 0.55f },
 			      76.8f};
 
-static const float PI = 3.1415926535;
+static const float PI = 3.1415926535; //pi approx
 
-// constructor
-CylinderWidget::CylinderWidget(QWidget *parent)
+CylinderWidget::CylinderWidget(QWidget *parent) // constructor sets up the project
   : QGLWidget(parent),
     _angle(0),
     _time(0),
@@ -102,9 +83,11 @@ CylinderWidget::CylinderWidget(QWidget *parent)
   slider_2(0),
   slider_3(1),
   slider_4(0),
-  _image("grass.ppm"),
+  slider_5(1),
+  position(0),
   _image_farm("grass2.ppm"),
-  _image_poster("poster.ppm")
+  _image_poster("poster.ppm"),
+  _image_earth("earth.ppm")
 
 	{ // constructor       
 
@@ -125,46 +108,34 @@ void CylinderWidget::updateAngle(int i){
   this->repaint();
 }
 
-void CylinderWidget::updateAngle(){
+void CylinderWidget::updateAngle(){ // update the position of tank.
   _time += 10.0;
+  position  += 10 + slider_5;
   this->repaint();
 }
   
+void CylinderWidget::updateSpeed(int i){ //
+    slider_5 = i;
+    this->repaint();
+}
+
 // called every time the widget is resized
 void CylinderWidget::resizeGL(int w, int h)
 	{ // resizeGL()
 	// set the viewport to the entire widget
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-//    GLfloat light_pos[] = {8,8., 8., 1.}; //TODO: Fix this light source up"
-
-
-//    glEnable(GL_LIGHTING); // enable lighting in general
-//        glEnable(GL_LIGHT0);   // each light source must also be enabled
-
-
-//        glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-//        glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180.0);
-
-
-        
+	glLoadIdentity();        
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-    glOrtho(-20.0, 20.0, -20.0, 20.0, -450.0, 450.0); // quick fix is to increase far.
+    glLoadIdentity();
+    glOrtho(-20.0, 20.0, -20.0, 20.0, -250.0, 250.0);
+    // Ortho is used with a big far and near to ensure no clipping(this is extra big to avoid any issue).
+
 
 	} // resizeGL()
 
-void CylinderWidget::normalize(GLfloat* vector)
-{
-  GLfloat norm = sqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
-  vector[0] /= norm;
-  vector[1] /= norm;
-  vector[2] /= norm; 
-}
 
-
+//these are functions which are affected by the sliders.
 
 void CylinderWidget::rotateAround(int i){
     slider_1_angle = i;
@@ -186,16 +157,15 @@ void CylinderWidget::panLeftRight(int i){
     this->repaint();
 }
 
-void CylinderWidget::flatplane(const materialStruct* p_front){
+void CylinderWidget::floor(const materialStruct* p_front){
+    //floor, light turned off here.
+    // made using gluDisk.
+    //similar to below, it's light is turned off, texture is on, then placed, texture off and then light back on.
+
 
 
     glDisable(GL_LIGHTING);
     glDisable(GL_LIGHT0);
-
-    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
-    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
 
     glEnable(GL_TEXTURE_2D);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image_farm.Width(), _image_farm.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _image_farm.imageField());
@@ -217,14 +187,40 @@ void CylinderWidget::flatplane(const materialStruct* p_front){
 
 }
 
+
+void CylinderWidget::globe(const materialStruct* p_front){
+    //this is the globe of the *far* away earth
+    // made using gluSphere.
+    //far from the current terrain, so it's light is unaffected by my lighting.
+    //similar to below, it's light is turned off, texture is on, then placed, texture off and then light back on.
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+
+    glEnable(GL_TEXTURE_2D);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image_earth.Width(), _image_earth.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _image_earth.imageField());
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
+    glBegin(GL_POLYGON);
+    GLUquadricObj *quadObj = gluNewQuadric();
+    gluQuadricTexture(quadObj,GLU_TRUE);
+
+    gluSphere(quadObj,10,100,100);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+}
+
 void CylinderWidget::board(const materialStruct* p_front){
-
-//    GLfloat normals[1][3] = { { 0., -1,0.}}; //TODO: LIGHT THE TEXTURES UP.
-
-//    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
-//    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
-//    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
-//    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+    // This is the board where the textures of marcus and mark are places
+    //Lighting is first disabled, then textures enabled,
+    //placed and once done, textures are disbaled and light is renabled.
+    //lighting left off to show this banner all the time(it's supposed to be lit up).
 
     glDisable(GL_LIGHTING);
     glDisable(GL_LIGHT0);
@@ -236,13 +232,7 @@ void CylinderWidget::board(const materialStruct* p_front){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-
-
-
-
-
     glBegin(GL_POLYGON);
-//    glNormal3fv(normals[0]);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(-1.0, 0.0, -1.0);
     glTexCoord2f(1.0, 0.0);
@@ -259,67 +249,69 @@ void CylinderWidget::board(const materialStruct* p_front){
 }
 
 
-void CylinderWidget::treeBasic(){ // so the idea is to scale the stuff here and move in paintGL. I think xd.
+void CylinderWidget::treeBasic(){ //Creates a basic tree without branches.
 
     glPushMatrix();
     glScalef(2,7,2); // The tree trunk
-    this->cylinder(&brownBark);
+    this->cylinder(&brownBark); //coloured brown.
     glPopMatrix();
+
     glPushMatrix();
-    glTranslatef(0,10,0); // first moves forwards back, middle moves sideway, last up n down
-    glScalef(5,5,5); // deform cylinder
-//    glRotatef(90,1,0,0);
+    glTranslatef(0,10,0); // move up the branch and place the leaves
+    glScalef(5,5,5); // in the form of a sphere(scaled properly).
     this->sphere(&greenRubber);
     glPopMatrix();
 
 }
 
 
-void CylinderWidget::treeBranches(){ // so the idea is to scale the stuff here and move in paintGL. I think xd.
+void CylinderWidget::treeBranches(){ //Creates a tree with branches.
 
     glPushMatrix();
-    glScalef(1.5,12,1.5); // The tree trunk
-    this->cylinder(&brownBark);
-
+    glScalef(1.5,12,1.5);
+    this->cylinder(&brownBark); // tree turn, coloured brown, and scaled.
     glPopMatrix();
-    glPushMatrix();
-    glTranslatef(0,15,0); // first moves forwards back, middle moves sideway, last up n down
-    glScalef(5,5,5); // deform cylinder
-//    glRotatef(90,1,0,0);
-    this->sphere(&greenRubber);
 
+    glPushMatrix();
+    glTranslatef(0,15,0);
+    glScalef(5,5,5);
+    this->sphere(&greenRubber); //tree leaves, coloured green, translated to place and scaled
     glPopMatrix(); // back to the start.
+
     glPushMatrix(); // save the start coordinates
     glTranslatef(3.9,5.5,0); //around half way up the bark
     glRotatef(70,0,0,1);
     glScalef(1,4,1);// rotate sideways.
-    this->cylinder(&brownBark);
+    this->cylinder(&brownBark); //a branch
 
     glPopMatrix(); // back to the start.
     glPushMatrix(); // save the start coordinates
-    glScalef(3,3,3); // deform cylinder
+    glScalef(3,3,3);
     glTranslatef(3.,1.7,0);
-    this->sphere(&greenRubber);
-
+    this->sphere(&greenRubber); //leaves on branch
     glPopMatrix(); // back to the start.
+
     glPushMatrix(); // save the start coordinates
     glTranslatef(-3.9,5.5,0); //around half way up the bark
     glRotatef(78,0,0,1);
     glScalef(1,4,1);// rotate sideways.
-    this->cylinder(&brownBark);
-
+    this->cylinder(&brownBark); //another branch
     glPopMatrix(); // back to the start.
+
     glPushMatrix(); // save the start coordinates
-    glScalef(2,2,2); // deform cylinder
+    glScalef(2,2,2);
     glTranslatef(-3.43  ,3.4,0);
     this->sphere(&greenRubber);
-    glPopMatrix(); // back to the start.
+    glPopMatrix(); // leaves on the 2nd branch
 
 
 }
 
 // for now I will leave pyramid out.
 void CylinderWidget::pyramid(const materialStruct* p_front){
+    // pyramid shape used in a few places.
+    // The normals were calculated by me prior to run time using the method on Khronos Group's website, by hand.
+    // There are 4 faces to this pryamid without a base(as it wasn't necessary to have a base for my use cases).
 
 GLfloat normals[][3] = { {0., 0.4472135954999579 ,0.8944271909999159},
                          {0.4472135954999579, 0.4472135954999579, 0.},
@@ -332,38 +324,35 @@ glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
 glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
 
     glBegin(GL_POLYGON);
-  //Triangle 1
     glNormal3fv(normals[0]);
     glVertex3f( 0.0f, 1.0f, 0.0f);
     glVertex3f(-1.0f,-1.0f, 1.0f);
     glVertex3f( 1.0f,-1.0f, 1.0f);
     glEnd();
-  //Triangle 2
+
     glBegin(GL_POLYGON);
     glNormal3fv(normals[1]);
-    glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
-    glVertex3f( 1.0f,-1.0f, 1.0f);   //V2(blue)
-    glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
+    glVertex3f( 0.0f, 1.0f, 0.0f);
+    glVertex3f( 1.0f,-1.0f, 1.0f);
+    glVertex3f( 1.0f,-1.0f,-1.0f);
     glEnd();
-  //Triangle 3
-    glBegin(GL_POLYGON);
 
+    glBegin(GL_POLYGON);
     glNormal3fv(normals[2]);
-    glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
-    glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
-    glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
+    glVertex3f( 0.0f, 1.0f, 0.0f);
+    glVertex3f( 1.0f,-1.0f,-1.0f);
+    glVertex3f(-1.0f,-1.0f,-1.0f);
     glEnd();
-  //Triangle 4
-    glBegin(GL_POLYGON);
 
+    glBegin(GL_POLYGON);
     glNormal3fv(normals[3]);
-    glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
-    glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
-    glVertex3f(-1.0f,-1.0f, 1.0f);   //V1(green)
+    glVertex3f( 0.0f, 1.0f, 0.0f);
+    glVertex3f(-1.0f,-1.0f,-1.0f);
+    glVertex3f(-1.0f,-1.0f, 1.0f);
     glEnd();
 }
 
-void CylinderWidget::sphere(const materialStruct* p_front ){
+void CylinderWidget::sphere(const materialStruct* p_front ){ //sphere from the tutorial, used in one part, otherwise gluSphere is used
 	
    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
@@ -417,7 +406,7 @@ void CylinderWidget::sphere(const materialStruct* p_front ){
     }
 }
 
-void CylinderWidget::cylinder(const materialStruct* p_front){
+void CylinderWidget::cylinder(const materialStruct* p_front){ //used in some parts, provided from the tutorial. Other parts use gluCylinder
 
 
 	
@@ -456,76 +445,11 @@ void CylinderWidget::cylinder(const materialStruct* p_front){
   }
 }
 
-void CylinderWidget::arm(double upper, double lower, double time){
-  double angle = upper*sin(0.1*time) + upper;
-  glPushMatrix();
-  glRotatef(angle,0.,1.,0.);
-  glScalef(0.3,0.3,2.); // deform cylinder
-  glTranslatef(0.,0.,-1);
-  this->cylinder(&greenRubber);
-  glTranslatef(0.,0.,-1);
-  glScalef(0.6/0.3,0.6/0.3,0.6/2.);
-  this->sphere(&yellowPlastic);
-  glScalef(1/0.6,1/0.6,1/0.6); // here we have undone all scalings; the origin is at the end of the upper arm  and the z-axis is aligned with that arm
-
-  glPushMatrix();
-  double lowangle = lower*sin(0.2*time) + lower;
-  glRotatef(lowangle,0.,1.,0.);
-  glScalef(0.3,0.3,2.); // deform cylinder
-  glTranslatef(0.,0.,-1);
-  this->cylinder(&greenRubber);
-  glTranslatef(0.,0.,-1);
-  glScalef(0.6/0.3,0.6/0.3,0.6/2.);
-  this->sphere(&yellowPlastic);
-  glPopMatrix();
-  glPopMatrix();
-  glPushMatrix();
-  glScalef(0.7,0.7,0.7);
-  this->sphere(&yellowPlastic);
-  glPopMatrix();
-     
-}
-
-void CylinderWidget::body(double time){
-
-  double z_min = -1; // the min and max coordinates in z of the cylinder
-  double z_max =  1; // could have made them class constants, or created a robot class
-
-  this->sphere(&emeraldMaterial);
-  glPushMatrix();
-  glTranslatef(0.,0.,-1);
-  glScalef(0.5,0.5,1.0);
-  this->cylinder(&greenRubber);
-  glPopMatrix(); // revert back to the original coordinate system
-  glTranslatef(0.,0.,z_min-z_max);
-  glPushMatrix(); // keep the end position of the 'neck'
-  glScalef(0.6,0.6,0.6);
-  this->sphere(&yellowPlastic);
-  glPopMatrix(); // undo scaling and
-  glPushMatrix(); // keep the end position of the neck
-  glRotatef(90,1.,0.,0.);
-  double shoulder_width = 3.0;
-  glScalef(0.4,0.4,shoulder_width);
-  this->cylinder(&ruby);
-  glPopMatrix();
-  glPushMatrix();
-  glTranslatef(0,-shoulder_width,0);
-  arm(45.,20,time);
-  glPopMatrix();
-  glPushMatrix();
-  glTranslatef(0, shoulder_width,0);
-  arm(30.,70.,time);
-  glPopMatrix();
-  glPushMatrix();
-  glTranslatef(0.,0.,-2.5);
-  glScalef(1,1,3);
-  this->cylinder(&ruby);
-  glPopMatrix();
-}
 
 
 
-void CylinderWidget::windHead(const materialStruct* p_front){
+void CylinderWidget::windHead(const materialStruct* p_front){ //head of the turbine(where blades connect) is made using sphere provided
+                                                              // by the code taught in class/tutorial.
 
     glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
@@ -581,7 +505,7 @@ void CylinderWidget::windHead(const materialStruct* p_front){
 
 
 
-void CylinderWidget::windBlade(const materialStruct* p_front){
+void CylinderWidget::windBlade(const materialStruct* p_front){ //blade made using glyCylinder
 
     glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
@@ -594,13 +518,10 @@ void CylinderWidget::windBlade(const materialStruct* p_front){
     glEnd();
 
 
-
-
 }
 
 
-
-void CylinderWidget::windTrunk(const materialStruct* p_front){
+void CylinderWidget::windTrunk(const materialStruct* p_front){ //using the method provided in the tutorial to generate a cylinder
 
     glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
@@ -639,41 +560,38 @@ void CylinderWidget::windTrunk(const materialStruct* p_front){
 void CylinderWidget::windMill(double time){
 
     glPushMatrix();
-    glScalef(0.5,6,0.5); // The tree trunk
+    glScalef(0.5,6,0.5); // The trunk of the wind turbine scaled and placed
     this->windTrunk(&whitePlastic);
     glPopMatrix();
     glPushMatrix();
-    glTranslatef(0,6.8,0); // TODO: FIX THESE HEIGHT/SCALING TO A SUITABLE SIZE LATER.
-    //    glScalef(1,1,1); // deform cylinder
-//    glRotatef(90,1,0,0);
+    glTranslatef(0,6.8,0); // Head of the windturbine placed with translate
     this->windHead(&whitePlastic);
     glPopMatrix();
+
     glPushMatrix();
-    glTranslatef(0.2,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glTranslatef(0.2,7,0);
     glScalef(0.4,0.4,0.4);
     glRotatef(0 + time,1,0,0);
-
-    this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
-    glPopMatrix();
+    this->windBlade(&silver); //place the 1rd windturbine blade, translated, scaled and rotated using time to animate
+    glPopMatrix();            // the motion of a wind turbine
 
     glPushMatrix();
-    glTranslatef(0.2,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glTranslatef(0.2,7,0);
     glScalef(0.4,0.4,0.4);
     glRotatef(-120 + time,1,0,0);
-    this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
+    this->windBlade(&silver); //place the 2nd windturbine blade
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(0.2,7,0); // first moves forwards back, middle moves sideway, last up n down
+    glTranslatef(0.2,7,0);
     glScalef(0.4,0.4,0.4);
     glRotatef(-240 + time,1,0,0);
-    this->windBlade(&silver); //TODO: WHY ARE THESE COLOURS AFFECTING THE FLOOR?
-    glPopMatrix(); // KEEP this one at the end
-
+    this->windBlade(&silver); //place the 3rd windturbine blade
+    glPopMatrix();
 }
 
 
-void CylinderWidget::tankHead(const materialStruct* p_front){
+void CylinderWidget::tankHead(const materialStruct* p_front){ //head for the tank, made using gluCylinder
 
     glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
@@ -685,11 +603,9 @@ void CylinderWidget::tankHead(const materialStruct* p_front){
     gluCylinder(quadObj, 10, 10., 10., 100, 100);
     glEnd();
 
-    //SO this needs to be rotated down -90? dont think it matters. Anyway do this in the actual part where I put it together. Has potential perfomance issues/mem leaks.
-
 }
 
-void CylinderWidget::tankHeadCover(const materialStruct* p_front){
+void CylinderWidget::tankHeadCover(const materialStruct* p_front){ // cover for tank head, made using gluDisk
     glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
@@ -699,12 +615,11 @@ void CylinderWidget::tankHeadCover(const materialStruct* p_front){
     GLUquadricObj *quadObj = gluNewQuadric();
     gluDisk(quadObj,10,10,100,100);
     glEnd();
-
 }
 
-void CylinderWidget::tankCannon(const materialStruct* p_front){
+void CylinderWidget::tankCannon(const materialStruct* p_front){ //cannon for tank, made using gluCylinder
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient); //give the tank lighting
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
     glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
@@ -716,17 +631,18 @@ void CylinderWidget::tankCannon(const materialStruct* p_front){
 
 }
 
-void CylinderWidget::cube(const materialStruct* p_front){
+void CylinderWidget::cube(const materialStruct* p_front){ //cube used for a few different objects such as tank.
 
     GLfloat normals[][3] = { {0., 1. ,0.}, {0., -1., 0.}, {0., 0., 1.}, {0., 0., -1.}, {-1, 0, 0}, {1, 0, 0} };
+    //calculated the normals before runtime(by hand and then inputted).
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient); //give the cube lighting
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
     glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
 
 
-    glBegin(GL_POLYGON);
+    glBegin(GL_POLYGON); // 6 sides of the cube
     glNormal3fv(normals[0]);
     glVertex3f(1.0f, 1.0f, -1.0f);
     glVertex3f(-1.0f, 1.0f, -1.0f);
@@ -777,7 +693,7 @@ void CylinderWidget::cube(const materialStruct* p_front){
 }
 
 
-void CylinderWidget::tankWheels(const materialStruct* p_front){
+void CylinderWidget::tankWheels(const materialStruct* p_front){ //wheels of the tank, made using gluCylinder
     glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
@@ -789,39 +705,39 @@ void CylinderWidget::tankWheels(const materialStruct* p_front){
     glEnd();
 }
 
-void CylinderWidget::base(){
+
+void CylinderWidget::base(){ // base of the tank ( bottom part of the tank hierachy)
 
     glPushMatrix();
     glScalef(9,3,9);
-    this->cube(&silver); //tank middle
+    this->cube(&silver); //tank middle made from a cube, scaled appropriately.
     glPopMatrix();
+
     glPushMatrix();
     glTranslatef(0,0,-11.5);
     glScalef(9,3.2,3.2);
     glRotatef(-90,1,0,0);
     this->pyramid(&silver);  // back side of the tank.
-    //TODO: Fix the lighting on the pyramid
     glPopMatrix();
     glPushMatrix();
     glTranslatef(0,0,11.5);
     glScalef(9,3.2,3.2);
     glRotatef(90,1,0,0);
     this->pyramid(&silver);  // front side of the tank.
-    //TODO: THIS PYRAMID MIGHT NEED DIFFERENT NORMALS, BUT PROBS NOT IF I WORK THEM OUT.
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(10,-1,7);
     glScalef(0.7,0.7,0.7);
     glRotatef(-90,0,1,0);
-    this->tankWheels(&ruby);
+    this->tankWheels(&ruby); // wheels of the tank
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(10,-1,0);
     glScalef(0.7,0.7,0.7);
     glRotatef(-90,0,1,0);
-    this->tankWheels(&ruby);
+    this->tankWheels(&ruby); // wheels of the tank
     glPopMatrix();
 
 
@@ -829,7 +745,7 @@ void CylinderWidget::base(){
     glTranslatef(10,-1,-7);
     glScalef(0.7,0.7,0.7);
     glRotatef(-90,0,1,0);
-    this->tankWheels(&ruby);
+    this->tankWheels(&ruby); // wheels of the tank
     glPopMatrix();
 
 
@@ -837,83 +753,74 @@ void CylinderWidget::base(){
     glTranslatef(-10,-1,-7);
     glScalef(0.7,0.7,0.7);
     glRotatef(90,0,1,0);
-    this->tankWheels(&ruby);
+    this->tankWheels(&ruby);  // wheels of the tank
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(-10,-1,0);
     glScalef(0.7,0.7,0.7);
     glRotatef(90,0,1,0);
-    this->tankWheels(&ruby);
+    this->tankWheels(&ruby);  // wheels of the tank
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(-10,-1,7);
     glScalef(0.7,0.7,0.7);
     glRotatef(90,0,1,0);
-    this->tankWheels(&ruby);
+    this->tankWheels(&ruby);  // wheels of the tank
     glPopMatrix();
 
 }
 
-void CylinderWidget::turret(){ // this angle may not be required. Time will tell.
+void CylinderWidget::turret(){ // This is the turret (top part of the tank hierachy)
 
-    glPushMatrix(); //start with the head of the tank.
+    glPushMatrix(); //start with the head of the tank and scale, translate, rotate if required
     glScalef(0.3,0.3,0.3);
-//    glTranslatef(10,10,10);
     glRotatef(-90,1,0,0);
     this->tankHead(&ruby);
     glPopMatrix();
 
-    glPushMatrix();
+    glPushMatrix(); // add the cover to the head and scale, translate, rotate if required
     glScalef(0.3,0.3,0.3);
     glRotatef(270,1,0,0);
     glTranslatef(0,0,10); //3rd done
     this->tankHeadCover(&ruby);
     glPopMatrix();
 
-    glPushMatrix();
+    glPushMatrix(); // add cannon, scale, translate, rotate if required
     glScalef(0.065,0.065,0.065);
     glTranslatef(0,20,0);
-
-
     this->tankCannon(&silver);
     glPopMatrix();
 
-//    glPopMatrix();
 
 }
 
-void CylinderWidget::tank(double time, double angle){ //TODO: ADD SLIDER FOR CONTROLING SPEED.
+void CylinderWidget::tank(double time){
     glPushMatrix();
-//    glTranslatef(2,2,10);
-
-    glRotatef(time * 0.2,0.,-1,0);
-//    glRotatef(time + 0.5,0.,-1,0);
-
-//    glRotatef(time+ 0.5,0,0,1);
-
-    glPushMatrix();
+    glRotatef(position,0.,-1,0); //This essentially allows the whole tank, base and
+                                 // turret to be rotated together in a circular fashion
+    glPushMatrix();              // as it is pushed but not popped so it affects the code below
     glTranslatef(2,2,18);
     glRotatef(60,0.,-1,0);
     glScalef(0.34,0.34,0.34);
-    base();
+    base(); //Base is translated, rotated and scaled into place
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(2,3,18);
-    glRotatef(time * 0.5,0.,1,0);
+    glRotatef(time * 0.5,0.,1,0); //Turret moves as a part of the heirachy requirement, independtly of the base
     glScalef(0.5,0.5,0.5);
+    turret();
 
-    turret();// 0,0 for now. TODO: Sort this out
     glPopMatrix();
 
     glPopMatrix();
 }
 
-void CylinderWidget::barn(){
+void CylinderWidget::barn(){ //barn(house) is made from a cube and a pyramid
     glPushMatrix();
-    this->cube(&brassMaterials);
+    this->cube(&polished_copper);
     glPopMatrix();
     glPushMatrix();
    glTranslatef(0,2,0);
@@ -925,205 +832,124 @@ void CylinderWidget::barn(){
 
 // called every time the widget needs painting
 void CylinderWidget::paintGL()
-    { // paintGL()
-	// clear the widget
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+{ // paintGL()
+    // clear the widget
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_NORMALIZE);
-        glShadeModel(GL_FLAT);
-//        glDisable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_FLAT);
 
+    // You must set the matrix mode to model view directly before enabling the depth test
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_DEPTH_TEST); //
 
-	// You must set the matrix mode to model view directly before enabling the depth test
-      	glMatrixMode(GL_MODELVIEW);
-       	glEnable(GL_DEPTH_TEST); //
+    GLfloat light_pos[] = { 40, 5., -10, 1 }; //light is positioned at this location
 
+    glEnable(GL_LIGHTING); // enable lighting in general
+    glEnable(GL_LIGHT0); // each light source must also be enabled
+    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180); //light positioned and given a sput cutoff of 180 degrees
 
-        GLfloat light_pos[] = {40,5.,-10, 1}; //TODO: Fix this light source up"
+    GLfloat ambient_light[] = { .6, .6, .6, 1. };
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light); // enable ambient lighting
 
+    GLfloat diffuse_light[] = { 1, 1, 1, 1 };
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light); // enable Diffused lighting
 
-        glEnable(GL_LIGHTING); // enable lighting in general
-        glEnable(GL_LIGHT0);   // each light source must also be enabled
-//        glEnable(GL_COLOR_MATERIAL);
-//        glEnable(GL_AMBIENT_AND_DIFFUSE);
-
-
-            glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-            glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180 );
-
-            GLfloat ambient_light[] = {.0,.0,.0,1.};
-            glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
-
-            GLfloat diffuse_light[] = {1,1,1,1};
-            glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
-
-
-            GLfloat specular_light[] = {0.2,0.2,0.2,1};
-            glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light);
-
-
+    GLfloat specular_light[] = { 0.5, 0.5, 0.5, 1 };
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light); // enable Specular lighting
 
     glLoadIdentity();
 
-    gluLookAt(2.3,0.7,1., 0.0,0.0,0.0, 0.0,1.0,0.0);
+    gluLookAt(2.3, 0.7, 1., 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-    glRasterPos2i(-1.,-1.);
+    glScalef(slider_3, slider_3, slider_3); // This globally zooms in by scaling the world.
+    glRotatef(slider_1_angle, 0., 1., 0.); // This globally rotates the world, to make it look like the camera is being moved.
+    glTranslatef(0., slider_2, 0.0); // This moves the camera up and down via translation.
+    glTranslatef(0, 0, (slider_4 * -1)); // This pans the camera left and right via translation.
 
-    if(slider_3 == 0){
-        slider_3 = 1;
-    }
+    glPushMatrix(); //windmill 1 (on left), translated to position.
+    glTranslatef(-3., 5., 10.);
+    windMill(_time);
+    glPopMatrix();
 
-    glScalef(static_cast<float>(slider_3),static_cast<float>(slider_3),static_cast<float>(slider_3));
-    std::cout << slider_4 << std::endl;
-
-
-    glPushMatrix();
-    glTranslatef(40,5.,0);
-
-    sphere(&ruby);
-//    tankHeadCover(&ruby);
-//    tankMiddle(&ruby);
-
-    glPopMatrix(); // pop
-
-
-    glRotatef(slider_1_angle,0.,1.,0.);
-    glTranslatef(0.,slider_2,0.0);
-    glTranslatef(0,0,(slider_4 * -1));
-
-
-    glPushMatrix();
-    glTranslatef(3.,5.,-10.); // x is forward and back,y is side ways, z is up or down.
-//    tankMiddle(&ruby);
+    glPushMatrix(); //windmill 2 (on right), translated to position
+    glTranslatef(-3., 5., -10.);
+    windMill(_time);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(-3.,5.,10.); // x is forward and back,y is side ways, z is up or down.
-//    glScalef(5,5,5);
-    windMill(_time);
-//    tankMiddle(&ruby);
 
+    glPushMatrix(); //draws the floor, along with scaling and rotating
+    glScalef(2.6, 2.6, 2.6);
+    glRotatef(270, 1, 0, 0);
+    floor(&whitePlastic);
+    glPopMatrix();
 
-//    pyramid(&ruby);
+    //tree 1 - basic tree with scaling, translation and rotation
+    glPushMatrix();
+    glScalef(0.3, 0.3, 0.3);
+    glTranslatef(15, 5, -15.);
+    glRotatef(-90, 0, 1, 0);
+    treeBasic(); //tree 1
     glPopMatrix(); // pop
 
+    //tree 2 - more advanced tree with scaling, translation and rotation
     glPushMatrix();
-    glTranslatef(-3.,5.,-10.);
-    windMill(_time); //windmill on the right.
+    glScalef(0.3, 0.3, 0.3);
+    glTranslatef(-15., 5., -25.);
+    glRotatef(-90, 0, 1, 0);
+    treeBranches(); //tree 2
     glPopMatrix(); // pop
 
+    //both of the trees below are the same as above just placed in the left hand side
+    glScalef(0.3, 0.3, 0.3);
+    glTranslatef(15, 5, 15.);
+    glRotatef(-90, 0, 1, 0);
+    treeBasic(); //tree 3
+    glPopMatrix();
 
     glPushMatrix();
+    glScalef(0.3, 0.3, 0.3);
+    glTranslatef(-15., 5., 25.);
+    glRotatef(-90, 0, 1, 0);
+    treeBranches(); //tree 4
+    glPopMatrix();
 
+    glPushMatrix();
+    tank(slider_5); // Tank takes in the time and slider_5(position) for animated movement
+    glPopMatrix();
 
+    glPushMatrix(); //barn(in the middle of the land). Translated and scaled
+    glTranslatef(0, 2, 0);
+    glScalef(3, 3, 3);
+    barn();
+    glPopMatrix();
 
+    glPushMatrix(); // created the billboard from a poll(cylinder) and board(flat plane)
+    glScalef(0.5, 5, 0.5);
+    glTranslatef(47, 1, -10);
+    this->cylinder(&blackPlastic); //TODO: CHANGE COLOUR OF THIS POLL. MAYBE REFACTOR THIS AREA.
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(24, 10, -5);
+    glRotatef(-90, 1, 0, 0);
+    glRotatef(90, 0, 0, 1);
+    glScalef(5, 5, 5);
+    board(&ruby);
+    glPopMatrix();
 
+    glPushMatrix(); // Sphere with earth texture added on here, which rotates.
+    glTranslatef(-50, 0, -20);
+    glScalef(0.15, .15, 0.15);
+    glRotatef(0.2 * _time, 0, 1, 0);
+    glRotatef(0.05 * _time, 0, 0, 1);
+    globe(&ruby);
+    glPopMatrix();
 
-//        glRotatef(180, 0, 1, 0);
-        glPushMatrix();
+    glPopMatrix();
 
-//        glScalef(16,16,16); //scale the floor - scale first
-    glScalef(2.6,2.6,2.6); //scale the floor - scale first
+    // flush to screen
+    glFlush();
 
-        glRotatef(270,1,0,0);
-
-        flatplane(&whitePlastic); //draw floor
-
-
-
-
-
-        glPopMatrix(); // pop
-
-        //back to the original matrix.
-
-//        glPushMatrix();
-
-//        glRotatef(-90,1,0,0); //hacky fix for the guy....
-
-//        glTranslatef(0,5,0);
-//        glScalef(0.3,0.3,0.3);
-
-////        body(_time);
-//        glPopMatrix(); // pop
-
-        glPushMatrix();
-//        glRotatef(0)
-        glScalef(0.3,0.3,0.3); // medium/bigger tree
-        glTranslatef(15,5,-15.); // x is forward and back,y is side ways, z is up or down.
-        glRotatef(-90,0,1,0); //THIS MIGHT BE NECESSARY for lighting purposes, even tho it doesn't do much rn.
-        treeBasic(); //tree 1
-        glPopMatrix(); // pop
-
-
-        glPushMatrix();
-        glScalef(0.3,0.3,0.3); // medium/bigger tree //TODO: FIX TREES
-        glTranslatef(-15.,5.,-25.); // x is forward and back,y is side ways, z is up or down.
-        glRotatef(-90,0,1,0);
-        treeBranches(); //tree 2
-        glPopMatrix(); // pop
-
-        //left hand side trees
-        glScalef(0.3,0.3,0.3); // medium/bigger tree
-        glTranslatef(15,5,15.); // x is forward and back,y is side ways, z is up or down.
-        glRotatef(-90,0,1,0); //THIS MIGHT BE NECESSARY for lighting purposes, even tho it doesn't do much rn.
-        treeBasic(); //tree 1
-        glPopMatrix(); // pop
-
-
-        glPushMatrix();
-        glScalef(0.3,0.3,0.3); // medium/bigger tree //TODO: FIX TREES
-        glTranslatef(-15.,5.,25.); // x is forward and back,y is side ways, z is up or down.
-        glRotatef(-90,0,1,0);
-        treeBranches(); //tree 2
-        glPopMatrix(); // pop
-
-        glPushMatrix();
-//        glScalef(,10,10);
-        tank(_time,0); // TODO: make angle variable
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(0,2,0);
-        glScalef(3,3,3);
-        barn();
-        glPopMatrix();
-
-        glPushMatrix();
-        glScalef(0.5,5,0.5);
-        glTranslatef(47,1,-10);
-        this->cylinder(&blackPlastic); //TODO: CHANGE COLOUR OF THIS POLL. MAYBE REFACTOR THIS AREA.
-        glPopMatrix();
-        glPushMatrix();
-        glTranslatef(24,10,-5);
-        glRotatef(-90,1,0,0);
-        glRotatef(90,0,0,1);
-        glScalef(5,5,5);
-        board(&ruby);
-        glPopMatrix();
-
-
-
-
-
-
-        glPopMatrix(); // KEEP THIS AT THE END
-        glPushMatrix(); //
-
-
-
-
-
-
-
-
-
-glPopMatrix();
-
-//        glDrawPixels(_image.Width(),_image.Height(),GL_RGB, GL_UNSIGNED_BYTE,_image.imageField());
-// this above works, not the top one tho...
-
-	// flush to screen
-	glFlush();	
-
-	} // paintGL()
+} // paintGL()

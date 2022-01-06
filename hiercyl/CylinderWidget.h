@@ -18,14 +18,14 @@ class CylinderWidget: public QGLWidget
 	CylinderWidget(QWidget *parent);
 
 	public slots:
-        // called by the slider in the main window
+    // public slot functions which are called when the slider is moved
 	void updateAngle(int);
 	void updateAngle();
     void rotateAround(int);
     void moveUpDown(int);
     void zoomIn(int);
     void panLeftRight(int);
-
+    void updateSpeed(int);
 
 	  
 	protected:
@@ -38,11 +38,12 @@ class CylinderWidget: public QGLWidget
 
 	private:
 
+      //functions used in the project
 	  void cylinder(const materialStruct*);
 	  void sphere(const materialStruct*);
 	  void body(double);
 	  void arm(double, double, double);
-      void flatplane(const materialStruct*);
+      void floor(const materialStruct*);
       void treeBasic();
       void treeBranches();
       void pyramid(const materialStruct*);
@@ -54,7 +55,6 @@ class CylinderWidget: public QGLWidget
       void tankCannon(const materialStruct*);
       void tankHead(const materialStruct*);
       void tankHeadCover(const materialStruct*);
-//      void tankMiddle(const materialStruct*); // removed as I used the cube
       void tankMiddleSide(const materialStruct*);
       void tankWheels(const materialStruct*);
       void turret();
@@ -62,20 +62,22 @@ class CylinderWidget: public QGLWidget
       void barn();
       void cube(const materialStruct*);
       void board(const materialStruct*);
+      void globe(const materialStruct*);
+      void tank(double);
 
-      void tank(double,double);
 
-
-
+    //instance variables
 	double _angle;
 	double _time;
     double slider_1_angle;
     double slider_2;
     double slider_3;
     double slider_4;
-    Image   _image;
+    double slider_5;
+    double position;
     Image _image_farm;
     Image _image_poster;
+    Image _image_earth;
     QImage* p_qimage;
 
 

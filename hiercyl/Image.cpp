@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cstdlib>
 
+//This class is used to import PPM images for usage as textures.
+
 Image::Image(const std::string& file_name)
 {
   p_qimage = new QImage(QString(file_name.c_str()));

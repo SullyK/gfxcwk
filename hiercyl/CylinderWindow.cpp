@@ -35,7 +35,6 @@ CylinderWindow::CylinderWindow(QWidget *parent)
     nSlider_2 = new QSlider(Qt::Horizontal);
     this->nSlider_2->setMinimum(-5);
     this->nSlider_2->setMaximum(5);
-//    this->nSlider_2->setValue(0);
 
     //create slider 3
     nSlider_3 = new QSlider(Qt::Horizontal);
@@ -44,18 +43,24 @@ CylinderWindow::CylinderWindow(QWidget *parent)
     this->nSlider_3->setValue(1);
 
 
-    //pan left and right.
+    //create slider 4
     nSlider_4 = new QSlider(Qt::Horizontal);
     this->nSlider_4->setMinimum(-20);
     this->nSlider_4->setMaximum(20);
-//    this->nSlider_4->setValue(0); // Qt doesn't like me doing * -1 here. I will do it in the function using slider_4
+
+
+    //create slider 5
+    nSlider_5 = new QSlider(Qt::Horizontal);
+    this->nSlider_5->setMinimum(-10);
+    this->nSlider_5->setMaximum(10);
+    this->nSlider_5->setValue(1);
 
     pTimer = new QTimer;
     pTimer->start(1);
 
     connect(pTimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateAngle()));
 
-    //connect the first slider to slot.
+    //connect the sliders to slots.
     connect(nSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(rotateAround(int)));
 
     connect(nSlider_2, SIGNAL(valueChanged(int)), cubeWidget, SLOT(moveUpDown(int)));
@@ -64,10 +69,34 @@ CylinderWindow::CylinderWindow(QWidget *parent)
 
     connect(nSlider_4, SIGNAL(valueChanged(int)), cubeWidget, SLOT(panLeftRight(int)));
 
+    connect(nSlider_5, SIGNAL(valueChanged(int)), cubeWidget, SLOT(updateSpeed(int)));
+
+
+    //add labels and sliders to windowLayout.
+    slider_1 = new QLabel("Rotate camera");
+    slider_1->setMaximumHeight(10);
+    windowLayout->addWidget(slider_1);
 	windowLayout->addWidget(nSlider);
+    slider_2 = new QLabel("Move camera up or down");
+    slider_2->setMaximumHeight(13);
+    windowLayout->addWidget(slider_2);
     windowLayout->addWidget(nSlider_2);
+    slider_3 = new QLabel("Zoom in or out");
+    slider_3->setMaximumHeight(10);
+    windowLayout->addWidget(slider_3);
     windowLayout->addWidget(nSlider_3);
+    slider_4 = new QLabel("Pan left or right");
+    slider_4->setMaximumHeight(13);
+    windowLayout->addWidget(slider_4);
     windowLayout->addWidget(nSlider_4);
+    slider_5 = new QLabel("Change speed of the tank");
+    slider_5->setMaximumHeight(13);
+    windowLayout->addWidget(slider_5);
+
+    windowLayout->addWidget(nSlider_5);
+
+
+
 
 
 	} // constructor
@@ -104,6 +133,10 @@ void CylinderWindow::ResetInterface()
     nSlider_4->setMinimum(-20);
     nSlider_4->setMaximum(20);
     nSlider_4->setValue(0);
+
+    nSlider_5->setMinimum(-10);
+    nSlider_5->setMaximum(10);
+    nSlider_5->setValue(1);
 
 
 	// now force refresh

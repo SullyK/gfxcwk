@@ -6,6 +6,7 @@
 #include <QSlider>
 #include <QTimer>
 #include <QBoxLayout>
+#include <QLabel>
 #include "CylinderWidget.h"
 
 class CylinderWindow: public QWidget
@@ -30,14 +31,24 @@ class CylinderWindow: public QWidget
 
 	// beneath that, the main widget
 	CylinderWidget *cubeWidget;
-	// and a slider for the number of vertices
-	QSlider *nSlider;
+
+    //Sliders setup
+    QSlider *nSlider;
     QSlider *nSlider_2;
     QSlider *nSlider_3;
     QSlider *nSlider_4;
+    QSlider *nSlider_5;
+    //Timer setup
+    QTimer   *pTimer;
 
-	QTimer   *pTimer;
-	  
+
+    // label setup
+    QLabel *slider_1;
+    QLabel *slider_2;
+    QLabel *slider_3;
+    QLabel *slider_4;
+    QLabel *slider_5;
+
 	// resets all the interface elements
 	void ResetInterface();
 	}; 
