@@ -18,7 +18,8 @@ class Image {
   unsigned int Width()  const { return _width;}
   unsigned int Height() const {return _height;}
  private:
-  Image(const Image&);
+  Image(const Image&) = delete;
+  Image &operator=(const Image&) = delete;
 
   unsigned int _width;
   unsigned int _height;

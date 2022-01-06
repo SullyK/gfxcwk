@@ -102,7 +102,10 @@ CylinderWidget::CylinderWidget(QWidget *parent)
   slider_2(0),
   slider_3(1),
   slider_4(0),
-  _image("road.ppm")
+  _image("grass.ppm"),
+  _image_farm("grass2.ppm"),
+  _image_poster("poster.ppm")
+
 	{ // constructor       
 
 	} // constructor
@@ -135,22 +138,16 @@ void CylinderWidget::resizeGL(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-//    GLfloat light_pos[] = {0., 10., 10., 0.};
+//    GLfloat light_pos[] = {8,8., 8., 1.}; //TODO: Fix this light source up"
 
 
-//	glEnable(GL_LIGHTING); // enable lighting in general
+//    glEnable(GL_LIGHTING); // enable lighting in general
 //        glEnable(GL_LIGHT0);   // each light source must also be enabled
 
 
 //        glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-//        glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0);
+//        glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180.0);
 
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image.Width(), _image.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _image.imageField());
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         
 	glMatrixMode(GL_PROJECTION);
@@ -190,42 +187,74 @@ void CylinderWidget::panLeftRight(int i){
 }
 
 void CylinderWidget::flatplane(const materialStruct* p_front){
-    GLfloat normals[][3] = { {1., 0. ,0.}, {-1., 0., 0.}, {0., 0., 1.}, {0., 0., -1.}, {0, 1, 0}, {0, -1, 0} };
 
 
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
 
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
+
+    glEnable(GL_TEXTURE_2D);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image_farm.Width(), _image_farm.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _image_farm.imageField());
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
+    glBegin(GL_POLYGON);
+    GLUquadricObj *quadObj = gluNewQuadric();
+    gluQuadricTexture(quadObj,GLU_TRUE);
+
+    gluDisk(quadObj,10,10,100,100);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+}
+
+void CylinderWidget::board(const materialStruct* p_front){
+
+//    GLfloat normals[1][3] = { { 0., -1,0.}}; //TODO: LIGHT THE TEXTURES UP.
 
 //    glMaterialfv(GL_FRONT, GL_AMBIENT,    p_front->ambient);
 //    glMaterialfv(GL_FRONT, GL_DIFFUSE,    p_front->diffuse);
 //    glMaterialfv(GL_FRONT, GL_SPECULAR,   p_front->specular);
 //    glMaterialf(GL_FRONT, GL_SHININESS,   p_front->shininess);
-////    glRotatef(180, 0, 1, 0);
-//        glTranslatef(90, 0, 0); //Moves it down,
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+
+    glEnable(GL_TEXTURE_2D);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image_poster.Width(), _image_poster.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _image_poster.imageField());
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
-        glBegin(GL_POLYGON);
-        //    glNormal3fv(normals[2]);
 
+
+
+
+    glBegin(GL_POLYGON);
+//    glNormal3fv(normals[0]);
     glTexCoord2f(0.0, 0.0);
-    glVertex3f(-1.0, 0.0, -1.0); //1 point
+    glVertex3f(-1.0, 0.0, -1.0);
     glTexCoord2f(1.0, 0.0);
-    glVertex3f(1.0,  0.0 , -1.0); //2 point
+    glVertex3f(1.0,  0.0 , -1.0);
     glTexCoord2f(1.0, 1.0);
-    glVertex3f(1.0, 0.0, 1.0); //3 point
+    glVertex3f(1.0, 0.0, 1.0);
     glTexCoord2f(0.0, 1.0);
     glVertex3f(-1.0, 0.0, 1.0);
-
-//    glBegin(GL_POLYGON);
-//    glTexCoord2f(0.0, 0.0);
-//       glVertex3f(-1.0, -1.0, 1.0);
-//       glTexCoord2f(1.0, 0.0);
-//       glVertex3f( 1.0, -1.0, 1.0);
-//       glTexCoord2f(1.0, 1.0);
-//       glVertex3f( 1.0,  1.0, 1.0);
-//       glTexCoord2f(0.0, 1.0);
-//       glVertex3f(-1.0,  1.0, 1.0);
-
     glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
 
 }
 
@@ -269,7 +298,7 @@ void CylinderWidget::treeBranches(){ // so the idea is to scale the stuff here a
     glPopMatrix(); // back to the start.
     glPushMatrix(); // save the start coordinates
     glScalef(3,3,3); // deform cylinder
-    glTranslatef(3.,2.7,0);
+    glTranslatef(3.,1.7,0);
     this->sphere(&greenRubber);
 
     glPopMatrix(); // back to the start.
@@ -282,7 +311,7 @@ void CylinderWidget::treeBranches(){ // so the idea is to scale the stuff here a
     glPopMatrix(); // back to the start.
     glPushMatrix(); // save the start coordinates
     glScalef(2,2,2); // deform cylinder
-    glTranslatef(-3.,2.7,0);
+    glTranslatef(-3.43  ,3.4,0);
     this->sphere(&greenRubber);
     glPopMatrix(); // back to the start.
 
@@ -855,7 +884,7 @@ void CylinderWidget::turret(){ // this angle may not be required. Time will tell
 
 }
 
-void CylinderWidget::tank(double time, double angle){
+void CylinderWidget::tank(double time, double angle){ //TODO: ADD SLIDER FOR CONTROLING SPEED.
     glPushMatrix();
 //    glTranslatef(2,2,10);
 
@@ -865,14 +894,14 @@ void CylinderWidget::tank(double time, double angle){
 //    glRotatef(time+ 0.5,0,0,1);
 
     glPushMatrix();
-    glTranslatef(2,2,15);
+    glTranslatef(2,2,18);
     glRotatef(60,0.,-1,0);
     glScalef(0.34,0.34,0.34);
     base();
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(2,3,15);
+    glTranslatef(2,3,18);
     glRotatef(time * 0.5,0.,1,0);
     glScalef(0.5,0.5,0.5);
 
@@ -908,21 +937,30 @@ void CylinderWidget::paintGL()
 	// You must set the matrix mode to model view directly before enabling the depth test
       	glMatrixMode(GL_MODELVIEW);
        	glEnable(GL_DEPTH_TEST); //
-//        glEnable(GL_TEXTURE_2D);
 
 
-        GLfloat light_pos[] = {8,8., 8., 1.}; //TODO: Fix this light source up"
+        GLfloat light_pos[] = {40,5.,-10, 1}; //TODO: Fix this light source up"
 
 
         glEnable(GL_LIGHTING); // enable lighting in general
         glEnable(GL_LIGHT0);   // each light source must also be enabled
+//        glEnable(GL_COLOR_MATERIAL);
+//        glEnable(GL_AMBIENT_AND_DIFFUSE);
 
 
             glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-            glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180);
+            glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180 );
 
-//            GLfloat ambientColour[] = {.5,.5,.5,1.};
-//            glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColour);
+            GLfloat ambient_light[] = {.0,.0,.0,1.};
+            glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
+
+            GLfloat diffuse_light[] = {1,1,1,1};
+            glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
+
+
+            GLfloat specular_light[] = {0.2,0.2,0.2,1};
+            glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light);
+
 
 
     glLoadIdentity();
@@ -940,9 +978,9 @@ void CylinderWidget::paintGL()
 
 
     glPushMatrix();
-    glTranslatef(8,8., 8);
+    glTranslatef(40,5.,0);
 
-//    sphere(&ruby);
+    sphere(&ruby);
 //    tankHeadCover(&ruby);
 //    tankMiddle(&ruby);
 
@@ -969,6 +1007,10 @@ void CylinderWidget::paintGL()
 //    pyramid(&ruby);
     glPopMatrix(); // pop
 
+    glPushMatrix();
+    glTranslatef(-3.,5.,-10.);
+    windMill(_time); //windmill on the right.
+    glPopMatrix(); // pop
 
 
     glPushMatrix();
@@ -980,12 +1022,17 @@ void CylinderWidget::paintGL()
 //        glRotatef(180, 0, 1, 0);
         glPushMatrix();
 
-        glScalef(12,12,12); //scale the floor - scale first
-        glPushMatrix();
-        flatplane(&ruby); //draw floor
+//        glScalef(16,16,16); //scale the floor - scale first
+    glScalef(2.6,2.6,2.6); //scale the floor - scale first
+
+        glRotatef(270,1,0,0);
+
+        flatplane(&whitePlastic); //draw floor
 
 
-        glPopMatrix(); // pop
+
+
+
         glPopMatrix(); // pop
 
         //back to the original matrix.
@@ -1003,13 +1050,31 @@ void CylinderWidget::paintGL()
         glPushMatrix();
 //        glRotatef(0)
         glScalef(0.3,0.3,0.3); // medium/bigger tree
-        glTranslatef(2,5,-15.); // x is forward and back,y is side ways, z is up or down.
+        glTranslatef(15,5,-15.); // x is forward and back,y is side ways, z is up or down.
+        glRotatef(-90,0,1,0); //THIS MIGHT BE NECESSARY for lighting purposes, even tho it doesn't do much rn.
         treeBasic(); //tree 1
         glPopMatrix(); // pop
 
+
         glPushMatrix();
         glScalef(0.3,0.3,0.3); // medium/bigger tree //TODO: FIX TREES
-        glTranslatef(5.,5.,-25.); // x is forward and back,y is side ways, z is up or down.
+        glTranslatef(-15.,5.,-25.); // x is forward and back,y is side ways, z is up or down.
+        glRotatef(-90,0,1,0);
+        treeBranches(); //tree 2
+        glPopMatrix(); // pop
+
+        //left hand side trees
+        glScalef(0.3,0.3,0.3); // medium/bigger tree
+        glTranslatef(15,5,15.); // x is forward and back,y is side ways, z is up or down.
+        glRotatef(-90,0,1,0); //THIS MIGHT BE NECESSARY for lighting purposes, even tho it doesn't do much rn.
+        treeBasic(); //tree 1
+        glPopMatrix(); // pop
+
+
+        glPushMatrix();
+        glScalef(0.3,0.3,0.3); // medium/bigger tree //TODO: FIX TREES
+        glTranslatef(-15.,5.,25.); // x is forward and back,y is side ways, z is up or down.
+        glRotatef(-90,0,1,0);
         treeBranches(); //tree 2
         glPopMatrix(); // pop
 
@@ -1019,10 +1084,24 @@ void CylinderWidget::paintGL()
         glPopMatrix();
 
         glPushMatrix();
-        glTranslatef(3,2,4);
+        glTranslatef(0,2,0);
         glScalef(3,3,3);
         barn();
         glPopMatrix();
+
+        glPushMatrix();
+        glScalef(0.5,5,0.5);
+        glTranslatef(47,1,-10);
+        this->cylinder(&blackPlastic); //TODO: CHANGE COLOUR OF THIS POLL. MAYBE REFACTOR THIS AREA.
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(24,10,-5);
+        glRotatef(-90,1,0,0);
+        glRotatef(90,0,0,1);
+        glScalef(5,5,5);
+        board(&ruby);
+        glPopMatrix();
+
 
 
 

@@ -51,7 +51,7 @@ CylinderWindow::CylinderWindow(QWidget *parent)
 //    this->nSlider_4->setValue(0); // Qt doesn't like me doing * -1 here. I will do it in the function using slider_4
 
     pTimer = new QTimer;
-    pTimer->start(10);
+    pTimer->start(1);
 
     connect(pTimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateAngle()));
 

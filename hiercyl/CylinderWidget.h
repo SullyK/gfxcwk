@@ -61,6 +61,7 @@ class CylinderWidget: public QGLWidget
       void base();
       void barn();
       void cube(const materialStruct*);
+      void board(const materialStruct*);
 
       void tank(double,double);
 
@@ -73,6 +74,8 @@ class CylinderWidget: public QGLWidget
     double slider_3;
     double slider_4;
     Image   _image;
+    Image _image_farm;
+    Image _image_poster;
     QImage* p_qimage;
 
 
