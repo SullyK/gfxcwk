@@ -83,7 +83,7 @@ CourseworkWidget::CourseworkWidget(QWidget *parent) // constructor sets up the p
   slider_2(0),
   slider_3(1),
   slider_4(0),
-  slider_5(-5),
+//  slider_5(-5),
   position(0),
   _image_farm("grass2.ppm"),
   _image_poster("poster.ppm"),
@@ -103,21 +103,62 @@ void CourseworkWidget::initializeGL()
  
 	} // initializeGL()
 
+void CourseworkWidget::disableLighting(){
+    if(lighting == 1){
+        lighting = 0;
+    }
+    else{
+        lighting = 1;
+    }
+    this->repaint();
+}
+void CourseworkWidget::speedStop(){
+    flag = 0;
+    this->repaint();
+
+}void CourseworkWidget::speedOne(){
+    flag = 1;
+    this->repaint();
+
+}void CourseworkWidget::speedTwo(){
+    flag = 2;
+    this->repaint();
+
+}
+
+void CourseworkWidget::speedThree(){
+    flag = 3;
+    this->repaint();
+
+}
 void CourseworkWidget::updateAngle(int i){
   _angle = i;
   this->repaint();
 }
 
-void CourseworkWidget::updateAngle(){ // update the position of tank.
-  _time += 10.0;
-  position  += 10 + slider_5;
+void CourseworkWidget::updateAngle(){ // update the speed of tank.
+    _time += 10.0;
+
+    if(flag == 0){
+        position += 0;
+    }
+    else if(flag == 1){
+        position  += 2;
+    }
+    else if(flag == 2){
+        position += 6;
+    }
+    else if(flag == 3){
+        position += 10;
+    }
+
   this->repaint();
 }
   
-void CourseworkWidget::updateSpeed(int i){ //
-    slider_5 = i;
-    this->repaint();
-}
+//void CourseworkWidget::updateSpeed(int i){ //
+//    slider_5 = i;
+//    this->repaint();
+//}
 
 // called every time the widget is resized
 void CourseworkWidget::resizeGL(int w, int h)
@@ -188,7 +229,7 @@ void CourseworkWidget::floor(const materialStruct* p_front){
 }
 
 
-void CourseworkWidget::globe(const materialStruct* p_front){
+void CourseworkWidget::globe(){
     //this is the globe of the *far* away earth
     // made using gluSphere.
     //far from the current terrain, so it's light is unaffected by my lighting.
@@ -198,7 +239,8 @@ void CourseworkWidget::globe(const materialStruct* p_front){
     glDisable(GL_LIGHT0);
 
     glEnable(GL_TEXTURE_2D);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image_earth.Width(), _image_earth.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _image_earth.imageField());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _image_earth.Width(), _image_earth.Height(),
+                 0, GL_RGB, GL_UNSIGNED_BYTE, _image_earth.imageField());
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -570,7 +612,8 @@ void CourseworkWidget::windMill(double time){
     glTranslatef(0.2,7,0);
     glScalef(0.4,0.4,0.4);
     glRotatef(0 + time,1,0,0);
-    this->windBlade(&silver); //place the 1rd windturbine blade, translated, scaled and rotated using time to animate
+    this->windBlade(&silver); //place the 1rd windturbine blade, translated,
+                              //scaled and rotated using time to animate
     glPopMatrix();            // the motion of a wind turbine
 
     glPushMatrix();
@@ -772,29 +815,28 @@ void CourseworkWidget::base(){ // base of the tank ( bottom part of the tank hie
 
 void CourseworkWidget::turret(){ // This is the turret (top part of the tank hierachy)
 
-    glPushMatrix(); //start with the head of the tank and scale, translate, rotate if required
+    glPushMatrix(); //start with the head of the tank and scaled and rotated
     glScalef(0.3,0.3,0.3);
     glRotatef(-90,1,0,0);
     this->tankHead(&ruby);
     glPopMatrix();
 
-    glPushMatrix(); // add the cover to the head and scale, translate, rotate if required
+    glPushMatrix(); // add the cover to the head and scaled, translated, rotated
     glScalef(0.3,0.3,0.3);
     glRotatef(270,1,0,0);
-    glTranslatef(0,0,10); //3rd done
+    glTranslatef(0,0,10);
     this->tankHeadCover(&ruby);
     glPopMatrix();
 
-    glPushMatrix(); // add cannon, scale, translate, rotate if required
+    glPushMatrix(); // add cannon, scale and translated
     glScalef(0.065,0.065,0.065);
     glTranslatef(0,20,0);
     this->tankCannon(&silver);
     glPopMatrix();
 
-
 }
 
-void CourseworkWidget::tank(double time){
+void CourseworkWidget::tank(double position){
     glPushMatrix();
     glRotatef(position,0.,-1,0); //This essentially allows the whole tank, base and
                                  // turret to be rotated together in a circular fashion
@@ -807,10 +849,9 @@ void CourseworkWidget::tank(double time){
 
     glPushMatrix();
     glTranslatef(2,3,18);
-    glRotatef(time * 0.5,0.,1,0); //Turret moves as a part of the heirachy requirement, independtly of the base
+    glRotatef(_time * 0.5,0.,1,0); //Turret moves as a part of the heirachy requirement, independtly of the base
     glScalef(0.5,0.5,0.5);
     turret();
-
     glPopMatrix();
 
     glPopMatrix();
@@ -843,27 +884,38 @@ void CourseworkWidget::paintGL()
 
     GLfloat light_pos[] = { 40, 5., -10, 1 }; //light is positioned at this location
 
+
     glEnable(GL_LIGHTING); // enable lighting in general
     glEnable(GL_LIGHT0); // each light source must also be enabled
 
     glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
     glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180); //light positioned and given a sput cutoff of 180 degrees
 
+
     GLfloat ambient_light[] = { 0.6, 0.6, 0.6, 1 };
+
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light); // enable ambient lighting
 
-    GLfloat diffuse_light[] = { 0.5, 0.5, 0.5, 1 };
+    GLfloat diffuse_light[] = { 0.5, 0.5, 0.5, 1 }; // if checkbox is clicked, turn off diffusive
+    if(lighting == 1){
+        diffuse_light[0] = 0;
+        diffuse_light[1] = 0;
+        diffuse_light[2] = 0;
+    }
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light); // enable Diffused lighting
+
 
     GLfloat specular_light[] = { 0.7, 0.7, 0.7, 1 };
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light); // enable Specular lighting
+
 
     glLoadIdentity();
 
     gluLookAt(2.3, 0.7, 1., 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
     glScalef(slider_3, slider_3, slider_3); // This globally zooms in by scaling the world.
-    glRotatef(slider_1_angle, 0., 1., 0.); // This globally rotates the world, to make it look like the camera is being moved.
+    glRotatef(slider_1_angle, 0., 1., 0.); // This globally rotates the world,
+                                           //to make it look like the camera is being moved.
     glTranslatef(0., slider_2, 0.0); // This moves the camera up and down via translation.
     glTranslatef(0, 0, (slider_4 * -1)); // This pans the camera left and right via translation.
 
@@ -934,7 +986,7 @@ void CourseworkWidget::paintGL()
 
 
     glPushMatrix();
-    tank(slider_5); // Tank takes in the time and slider_5(position) for animated movement
+    tank(position); // Tank takes in the time (position) for animated movement
     glPopMatrix();
 
     glPushMatrix(); //barn(in the middle of the land). Translated and scaled
@@ -946,7 +998,7 @@ void CourseworkWidget::paintGL()
     glPushMatrix(); // created the billboard from a poll(cylinder) and board(flat plane)
     glScalef(0.5, 5, 0.5);
     glTranslatef(47, 1, -10);
-    this->cylinder(&blackPlastic); //TODO: CHANGE COLOUR OF THIS POLL. MAYBE REFACTOR THIS AREA.
+    this->cylinder(&blackPlastic);
     glPopMatrix();
     glPushMatrix();
     glTranslatef(24, 10, -5);
@@ -961,7 +1013,7 @@ void CourseworkWidget::paintGL()
     glScalef(0.15, .15, 0.15);
     glRotatef(0.2 * _time, 0, 1, 0);
     glRotatef(0.05 * _time, 0, 0, 1);
-    globe(&ruby);
+    globe();
     glPopMatrix();
 
     glPopMatrix();

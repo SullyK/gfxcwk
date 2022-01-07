@@ -7,6 +7,10 @@
 #include <QTimer>
 #include <QBoxLayout>
 #include <QLabel>
+#include <QPushButton>
+#include <QCheckBox>
+
+
 #include "CourseworkWidget.h"
 
 class CourseworkWindow: public QWidget
@@ -37,7 +41,7 @@ class CourseworkWindow: public QWidget
     QSlider *nSlider_2;
     QSlider *nSlider_3;
     QSlider *nSlider_4;
-    QSlider *nSlider_5;
+//    QSlider *nSlider_5;
     //Timer setup
     QTimer   *pTimer;
 
@@ -47,7 +51,18 @@ class CourseworkWindow: public QWidget
     QLabel *slider_2;
     QLabel *slider_3;
     QLabel *slider_4;
-    QLabel *slider_5;
+    QLabel *tank_speed;
+
+//    QLabel *slider_5;
+
+    //create push button
+    QPushButton *button_0;
+    QPushButton *button_1;
+    QPushButton *button_2;
+    QPushButton *button_3;
+
+    //One check
+    QCheckBox *checkbox;
 
 	// resets all the interface elements
 	void ResetInterface();

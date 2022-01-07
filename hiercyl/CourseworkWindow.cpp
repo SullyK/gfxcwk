@@ -39,7 +39,7 @@ CourseworkWindow::CourseworkWindow(QWidget *parent)
     //create slider 3
     nSlider_3 = new QSlider(Qt::Horizontal);
     this->nSlider_3->setMinimum(1);
-    this->nSlider_3->setMaximum(4); //get this to down to 2.5 with -0.5 in the function that uses it.
+    this->nSlider_3->setMaximum(4);
     this->nSlider_3->setValue(1);
 
 
@@ -49,11 +49,22 @@ CourseworkWindow::CourseworkWindow(QWidget *parent)
     this->nSlider_4->setMaximum(20);
 
 
-    //create slider 5
-    nSlider_5 = new QSlider(Qt::Horizontal);
-    this->nSlider_5->setMinimum(-10);
-    this->nSlider_5->setMaximum(5);
-    this->nSlider_5->setValue(-5);
+    //set the buttons
+    button_0 = new QPushButton("STOP");
+    button_1 = new QPushButton("slow");
+    button_2 = new QPushButton("medium");
+    button_3 = new QPushButton("fast");
+
+    //checkbox
+    checkbox = new QCheckBox("Disable Diffusive lighting");
+
+    //signals/slots for checkbox and buttons
+    connect(checkbox, SIGNAL(clicked()), cubeWidget, SLOT(disableLighting()));
+
+    connect(button_0, SIGNAL(clicked()), cubeWidget, SLOT(speedStop()));
+    connect(button_1, SIGNAL(clicked()), cubeWidget, SLOT(speedOne()));
+    connect(button_2, SIGNAL(clicked()), cubeWidget, SLOT(speedTwo()));
+    connect(button_3, SIGNAL(clicked()), cubeWidget, SLOT(speedThree()));
 
     pTimer = new QTimer;
     pTimer->start(1);
@@ -68,8 +79,6 @@ CourseworkWindow::CourseworkWindow(QWidget *parent)
     connect(nSlider_3, SIGNAL(valueChanged(int)), cubeWidget, SLOT(zoomIn(int)));
 
     connect(nSlider_4, SIGNAL(valueChanged(int)), cubeWidget, SLOT(panLeftRight(int)));
-
-    connect(nSlider_5, SIGNAL(valueChanged(int)), cubeWidget, SLOT(updateSpeed(int)));
 
 
     //add labels and sliders to windowLayout.
@@ -89,14 +98,32 @@ CourseworkWindow::CourseworkWindow(QWidget *parent)
     slider_4->setMaximumHeight(13);
     windowLayout->addWidget(slider_4);
     windowLayout->addWidget(nSlider_4);
-    slider_5 = new QLabel("Change speed of the tank");
-    slider_5->setMaximumHeight(13);
-    windowLayout->addWidget(slider_5);
-
-    windowLayout->addWidget(nSlider_5);
+    tank_speed = new QLabel("Control Tank speed");
+    tank_speed->setMaximumHeight(13);
+    windowLayout->addWidget(tank_speed);
 
 
+    //create layout and place buttons in them.
+    QHBoxLayout* boxlayout = new QHBoxLayout();
+    button_0->setMaximumWidth(70);
+    boxlayout->addWidget(button_0);
+    button_1->setMaximumWidth(70);
+    boxlayout->addWidget(button_1);
+    button_2->setMaximumWidth(70);
+    boxlayout->addWidget(button_2);
+    button_3->setMaximumWidth(70);
+    boxlayout->addWidget(button_3);
 
+    QWidget *qwid = new QWidget();
+
+    qwid->setLayout(boxlayout); //layout signle grid for the buttons added to qwidget
+
+    qwid->setMaximumHeight(40);
+
+    windowLayout->addWidget(qwid); //add widget to windowlayout
+
+
+    windowLayout->addWidget(checkbox);
 
 
 	} // constructor
@@ -117,7 +144,7 @@ CourseworkWindow::~CourseworkWindow()
 // resets all the interface elements
 void CourseworkWindow::ResetInterface()
 	{ // ResetInterface()
-    nSlider->setMinimum(0);
+    nSlider->setMinimum(0); //reset values
     nSlider->setMaximum(360);
     nSlider->setValue(0);
 
@@ -126,17 +153,13 @@ void CourseworkWindow::ResetInterface()
     nSlider_2->setValue(0);
 	
     nSlider_3->setMinimum(1);
-    nSlider_3->setMaximum(4); //get this to down to 2.5 with -0.5 in the function that uses it.
+    nSlider_3->setMaximum(4);
     nSlider_3->setValue(1);
 
 
     nSlider_4->setMinimum(-20);
     nSlider_4->setMaximum(20);
     nSlider_4->setValue(0);
-
-    nSlider_5->setMinimum(-10);
-    nSlider_5->setMaximum(5);
-    nSlider_5->setValue(-5);
 
 
 	// now force refresh

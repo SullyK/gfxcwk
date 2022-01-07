@@ -25,7 +25,11 @@ class CourseworkWidget: public QGLWidget
     void moveUpDown(int);
     void zoomIn(int);
     void panLeftRight(int);
-    void updateSpeed(int);
+    void speedStop();
+    void speedOne();
+    void speedTwo();
+    void speedThree();
+    void disableLighting();
 
 	  
 	protected:
@@ -57,13 +61,14 @@ class CourseworkWidget: public QGLWidget
       void tankHeadCover(const materialStruct*);
       void tankMiddleSide(const materialStruct*);
       void tankWheels(const materialStruct*);
+      void cube(const materialStruct*);
       void turret();
       void base();
-      void barn();
-      void cube(const materialStruct*);
-      void board(const materialStruct*);
-      void globe(const materialStruct*);
       void tank(double);
+
+      void barn();
+      void board(const materialStruct*);
+      void globe();
 
 
     //instance variables
@@ -73,8 +78,9 @@ class CourseworkWidget: public QGLWidget
     double slider_2;
     double slider_3;
     double slider_4;
-    double slider_5;
     double position;
+    int flag = 1;
+    bool lighting = 0;
     Image _image_farm;
     Image _image_poster;
     Image _image_earth;
